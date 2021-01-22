@@ -1,6 +1,7 @@
 *.jou
 *.log
 vivado*.str
+vivado/*/
 *.ghw
 *.o
 __pycache__
