@@ -1,3 +1,8 @@
 *.jou
 *.log
 vivado*.str
+*.ghw
+*.o
+__pycache__
+sim_build
+results.xml
