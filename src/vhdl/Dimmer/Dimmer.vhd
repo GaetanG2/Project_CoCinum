@@ -2,7 +2,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity LightSequencer is
+entity Dimmer is
     generic(
         CLK_FREQUENCY_HZ : positive
     );
@@ -11,9 +11,9 @@ entity LightSequencer is
         switches_i : in std_logic_vector(15 downto 0);
         leds_o     : out std_logic_vector(15 downto 0)
     );
-end LightSequencer;
+end Dimmer;
 
-architecture Behavioral of LightSequencer is
+architecture Behavioral of Dimmer is
     -- Declarations
 begin
     -- Concurrent statements
