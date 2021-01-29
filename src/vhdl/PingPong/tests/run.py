@@ -82,7 +82,7 @@ class Gui:
 
         if delta >= refresh_time:
             self.last_update = t
-            for i in range(led_count):
+            for i in range(-led_count, 0):
                 led = self.dut.leds_o.value.binstr[i]
                 if led == '1':
                     color = led_color_on
