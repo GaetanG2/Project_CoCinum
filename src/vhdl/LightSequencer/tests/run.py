@@ -69,7 +69,7 @@ class Gui:
                 self.canvas.itemconfig(self.leds[i], fill=color)
 
                 coords = self.canvas.coords(self.sws[i])
-                if self.sw_states & (1 << (15 - i)):
+                if self.sw_states & (1 << (-i - 1)):
                     coords[1] = led_width + led_margin
                     coords[3] = led_width + led_margin + sw_cursor_height
                 else:
