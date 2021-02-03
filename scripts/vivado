@@ -3,7 +3,9 @@
 VERSION=2019.1
 
 if [ "$(which vivado)" == "" ]; then
-    . /opt/Xilinx/Vivado/$VERSION/settings64.sh
+    export XILINX_VIVADO=/opt/Xilinx/Vivado/$VERSION
+    export PATH=$XILINX_VIVADO/bin:$PATH
+    export LANG=en_US.UTF-8
 fi
 
-LANG=C vivado $* &
+vivado $* &
