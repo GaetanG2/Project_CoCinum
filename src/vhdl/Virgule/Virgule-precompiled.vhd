@@ -2290,10 +2290,10 @@ begin
   wrap_data_i <= typwrap_data_i(data_i);
   wrap_done_i <= done_i;
   wrap_irq_i <= irq_i;
-  address_o <= std_ulogic_vector(wrap_address_o);
-  data_o <= std_ulogic_vector(wrap_data_o);
+  address_o <= wrap_address_o;
+  data_o <= wrap_data_o;
   write_o <= wrap_write_o;
-  select_o <= std_ulogic_vector(wrap_select_o);
+  select_o <= wrap_select_o;
   wrap_address_o <= n88_o;
   wrap_data_o <= load_store_inst_bus_data_o;
   wrap_write_o <= n92_o;
