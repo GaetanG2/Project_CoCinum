@@ -47,4 +47,4 @@ memclr_done:
        The default behavior is to loop on the label 'finalize'. */
     lw t0, __finalizer
 finalize:
-    jalr t0
+    jr t0

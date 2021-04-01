@@ -5,27 +5,27 @@
 
     .global main
 main:
-    la x1, str
-    li x2, INTC_EVENTS
-    li x3, UART_DATA
+    la x5, str
+    li x6, INTC_EVENTS
+    li x7, UART_DATA
 
 main_loop:
-    lb x4, (x1)
+    lb x4, (x5)
     beqz x4, main_end
 
-    sb x4, (x3)
+    sb x4, (x7)
 
 main_polling_loop:
-    lw x4, (x2)
+    lw x4, (x6)
     andi x4, x4, INTC_EVENTS_UART_TX
     beqz x4, main_polling_loop
-    sw x4, (x2)
+    sw x4, (x6)
 
-    addi x1, x1, 1
+    addi x5, x5, 1
     j main_loop
 
 main_end:
     ret
 
 str:
-    .asciz "Hello\n"
+    .asciz "Virgule says\n<< Hello! >>\nfrom assembly.\n"

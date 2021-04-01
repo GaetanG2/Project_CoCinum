@@ -8,6 +8,6 @@ C_DEPS = \
 	../UART/UART-basic.c \
 	../Memory/Memory.c
 
-C_FLAGS_USER = -Os
+C_FLAGS_USER = -Os -fpie
 
 include ../../../scripts/Virgule.make

@@ -4,10 +4,14 @@
 #include <Platform/Platform-config.h>
 
 // Defined in virgule.ld
-extern uint32_t __boot_start, __boot_end, __finalizer;
+extern uint32_t __boot_start, __boot_end;
+extern void (*__finalizer)(void);
 
-#define PROGRAM ((uint8_t*)0)
+#define PROGRAM         ((uint8_t*)0)
 #define BOOT_START_ADDR ((uint32_t)&__boot_start)
+
+#define FINALIZER_START ((uint32_t)&__finalizer)
+#define FINALIZER_END   (FINALIZER_START + sizeof(__finalizer))
 
 static uint8_t get_hex_digit(UART *dev) {
     char c = UART_getc(dev);
@@ -31,7 +35,8 @@ static inline uint16_t get_hex_u16(UART *dev) {
     return (get_hex_u8(dev) << 8) + get_hex_u8(dev);
 }
 
-void receive(void) {
+__attribute__((noreturn))
+static void receive(void) {
     InterruptController *const intc = (InterruptController*)INTC_ADDRESS;
 
     InterruptController_disable(intc, -1);
@@ -69,7 +74,7 @@ void receive(void) {
         // Read the data bytes.
         for (int i = 0; i < count; i ++, addr ++) {
             c = get_hex_u8(&uart);
-            if (rtype == 0 && addr < BOOT_START_ADDR) {
+            if (rtype == 0 && addr < BOOT_START_ADDR && !(addr >= FINALIZER_START && addr < FINALIZER_END)) {
                 PROGRAM[addr] = c;
             }
         }
@@ -83,11 +88,6 @@ void receive(void) {
         }
     }
 
-    // Set the variable __finalizer of the user program to the adress of this
-    // 'receive' function (translated to the end of the memory) so that it is
-    // executed again when returning from the user's 'main' function.
-    __finalizer = (uint32_t)((uint8_t*)receive + BOOT_START_ADDR);
-
     UART_puts(&uart, "\\\\// Starting user program...\n");
 
     InterruptController_clear_events(intc, -1);
@@ -96,8 +96,10 @@ void receive(void) {
     // region that has been overwritten. We jump directly to address 0.
     // The user program will take care to initialize the stack again.
     asm("jr zero");
+    __builtin_unreachable();
 }
 
+__attribute__((noreturn))
 void main(void) {
     // Copy this program to the 'boot' region of the memory.
     uint32_t *src = 0;
@@ -107,17 +109,10 @@ void main(void) {
         *dest ++ = *src ++;
     }
 
-    // Branch to the copy of this program in the 'boot' region.
-    asm(
-        "auipc t1, 0\n"
-        "addi t1, t1, 20\n"
-        "add t1, t1, %0\n"
-        "add gp, gp, %0\n"
-        "jr t1\n"
-        :
-        : "r" (&__boot_start)
-        : "t1", "gp"
-    );
-
-    receive();
+    // Branch to the copy of the receive function in the 'boot' region.
+    // Set the variable __finalizer to the same address so that it is executed
+    // again when returning from the user's 'main' function.
+    __finalizer = receive + BOOT_START_ADDR;
+    __finalizer();
+    __builtin_unreachable();
 }

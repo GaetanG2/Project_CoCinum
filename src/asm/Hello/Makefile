@@ -1,6 +1,6 @@
 
 MEM_SIZE = 65536
 
-all: Hello_pkg.vhd
+all: Hello.hex
 
 include ../../../scripts/Virgule.make
