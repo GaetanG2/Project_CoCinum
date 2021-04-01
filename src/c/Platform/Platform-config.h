@@ -1,0 +1,10 @@
+
+#ifndef PLATFORM_CONFIG_H_
+#define PLATFORM_CONFIG_H_
+
+#define INTC_ADDRESS     0x81000000
+#define UART_ADDRESS     0x82000000
+#define UART_RX_IRQ_MASK 1
+#define UART_TX_IRQ_MASK 2
+
+#endif
