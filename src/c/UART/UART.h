@@ -15,7 +15,7 @@ typedef volatile struct {
 
 typedef struct {
     InterruptController *intc;
-    uint32_t rx_irq_mask, tx_irq_mask;
+    uint32_t rx_evt_mask, tx_evt_mask;
     volatile uint8_t *data;
     UARTBuffer tx_buffer, rx_buffer;
     volatile bool tx_busy;
@@ -25,6 +25,7 @@ void UART_init(UART *dev);
 void UART_putc(UART *dev, uint8_t c);
 uint8_t UART_getc(UART *dev);
 void UART_puts(UART *dev, const uint8_t *s);
+bool UART_has_data(UART *dev);
 void UART_irq_handler(UART *dev);
 
 #endif

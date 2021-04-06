@@ -36,9 +36,9 @@ static void UARTBuffer_write(UARTBuffer *q, uint8_t c) {
 }
 
 void UART_irq_handler(UART *dev) {
-    if (InterruptController_has_events(dev->intc, dev->tx_irq_mask)) {
+    if (InterruptController_has_events(dev->intc, dev->tx_evt_mask)) {
         // Acknowledge the interrupt request.
-        InterruptController_clear_events(dev->intc, dev->tx_irq_mask);
+        InterruptController_clear_events(dev->intc, dev->tx_evt_mask);
         // If the transmit buffer is not empty, send the next byte.
         if (dev->tx_buffer.count > 0) {
             *dev->data = UARTBuffer_read(&dev->tx_buffer);
@@ -48,24 +48,24 @@ void UART_irq_handler(UART *dev) {
         }
     }
 
-    if (InterruptController_has_events(dev->intc, dev->rx_irq_mask)) {
+    if (InterruptController_has_events(dev->intc, dev->rx_evt_mask)) {
         // Acknowledge the interrupt request.
-        InterruptController_clear_events(dev->intc, dev->rx_irq_mask);
+        InterruptController_clear_events(dev->intc, dev->rx_evt_mask);
         // Add the received byte to the receive buffer.
         UARTBuffer_write(&dev->rx_buffer, *dev->data);
     }
 }
 
 void UART_init(UART *dev) {
-    InterruptController_disable(dev->intc, dev->tx_irq_mask | dev->rx_irq_mask);
-    InterruptController_clear_events(dev->intc, dev->tx_irq_mask | dev->rx_irq_mask);
+    InterruptController_disable(dev->intc, dev->tx_evt_mask | dev->rx_evt_mask);
+    InterruptController_clear_events(dev->intc, dev->tx_evt_mask | dev->rx_evt_mask);
 
     UARTBuffer_init(&dev->tx_buffer);
     UARTBuffer_init(&dev->rx_buffer);
 
     dev->tx_busy = false;
 
-    InterruptController_enable(dev->intc, dev->tx_irq_mask | dev->rx_irq_mask);
+    InterruptController_enable(dev->intc, dev->tx_evt_mask | dev->rx_evt_mask);
 }
 
 void UART_putc(UART *dev, uint8_t c) {
@@ -73,7 +73,7 @@ void UART_putc(UART *dev, uint8_t c) {
     while (dev->tx_buffer.count == UART_BUFFER_LENGTH);
 
     // Disable transmit interrupts while updating the transmit buffer.
-    InterruptController_disable(dev->intc, dev->tx_irq_mask);
+    InterruptController_disable(dev->intc, dev->tx_evt_mask);
 
     // If a transmit operation is in progress, add the data byte
     // to the transmit buffer. Otherwise, send the byte to the device directly
@@ -87,7 +87,7 @@ void UART_putc(UART *dev, uint8_t c) {
     }
 
     // Enable interrupts again to detect the end of the transmit operation.
-    InterruptController_enable(dev->intc, dev->tx_irq_mask);
+    InterruptController_enable(dev->intc, dev->tx_evt_mask);
 }
 
 uint8_t UART_getc(UART *dev) {
@@ -95,9 +95,9 @@ uint8_t UART_getc(UART *dev) {
     while (dev->rx_buffer.count == 0);
 
     // Disable receive interrupts while updating the receive buffer.
-    InterruptController_disable(dev->intc, dev->rx_irq_mask);
+    InterruptController_disable(dev->intc, dev->rx_evt_mask);
     uint8_t c = UARTBuffer_read(&dev->rx_buffer);
-    InterruptController_enable(dev->intc, dev->rx_irq_mask);
+    InterruptController_enable(dev->intc, dev->rx_evt_mask);
 
     return c;
 }
@@ -106,4 +106,8 @@ void UART_puts(UART *dev, const uint8_t *s) {
     while (*s) {
         UART_putc(dev, *s ++);
     }
+}
+
+bool UART_has_data(UART *dev) {
+    return dev->rx_buffer.count > 0;
 }
