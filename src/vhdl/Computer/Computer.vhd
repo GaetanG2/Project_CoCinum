@@ -38,10 +38,10 @@ architecture Structural of Computer is
     signal intc_rdata     : word_t;
     signal intc_events    : word_t;
 
-    signal uart_tx_start  : std_logic;
+    signal uart_write     : std_logic;
     signal uart_tx_done   : std_logic;
     signal uart_rx_done   : std_logic;
-    signal uart_rx_data   : word_t;
+    signal uart_rdata     : word_t;
 begin
     -- Concurrent statements
 end Structural;
