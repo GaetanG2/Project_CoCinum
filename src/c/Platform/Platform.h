@@ -15,5 +15,6 @@ extern UART                *const uart;
 extern Timer               *const timer;
 extern SegmentDisplay      *const display;
 extern UserOutputs         *const leds;
+extern UserInputs          *const btns;
 
 #endif

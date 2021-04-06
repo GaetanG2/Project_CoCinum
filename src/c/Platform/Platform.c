@@ -25,3 +25,13 @@ Timer *const timer = &timer_priv;
 SegmentDisplay *const display = (SegmentDisplay*)DISPLAY_ADDRESS;
 
 UserOutputs *const leds = (UserOutputs*)LEDS_ADDRESS;
+
+static UserInputs btns_priv = {
+    .intc = intc,
+    .evt_mask = INTC_EVENTS_BTNS,
+    .status = (uint32_t*)BTNS_ADDRESS,
+    .on_evt = (uint32_t*)BTNS_ADDRESS + 1,
+    .off_evt = (uint32_t*)BTNS_ADDRESS + 2,
+};
+
+UserInputs *const btns = &btns_priv;
