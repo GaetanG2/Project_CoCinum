@@ -5,6 +5,7 @@
 
 static uint16_t count;
 static uint16_t points;
+static uint16_t leds_next;
 
 __attribute__((interrupt("machine")))
 void irq_handler(void) {
@@ -17,12 +18,15 @@ void irq_handler(void) {
             points = 1;
         }
         SegmentDisplay_show(display, count, points);
-        *leds = 0;
+
+        *leds = leds_next;
+        leds_next = 0;
+
         Timer_clear_event(timer);
     }
 
     if (UserInputs_has_event(btns)) {
-        *leds = *btns->on_evt | *btns->off_evt;
+        leds_next |= *btns->on_evt | *btns->off_evt;
         UserInputs_clear_event(btns);
     }
 }
@@ -31,8 +35,10 @@ void main(void) {
     UART_init(uart);
     UART_puts(uart, "Virgule says\n<< Hello! >>\nPress a key to terminate.\n");
 
-    count  = 0;
-    points = 1;
+    count     = 0;
+    points    = 1;
+    leds_next = 0;
+
     SegmentDisplay_show(display, count, points);
 
     Timer_init(timer);
