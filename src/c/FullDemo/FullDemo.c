@@ -23,9 +23,9 @@ void irq_handler(void) {
         Timer_clear_event(timer);
     }
 
-    if (UserInputs_has_event(btns)) {
-        leds_next |= *btns->on_evt | *btns->off_evt;
-        UserInputs_clear_event(btns);
+    if (UserInputs_has_events(btns)) {
+        leds_next |= UserInputs_get_on_events(btns) | UserInputs_get_off_events(btns);
+        UserInputs_clear_events(btns);
     }
 }
 
@@ -43,7 +43,7 @@ void main(void) {
     Timer_set_limit(timer, CLK_FREQUENCY_HZ / 2);
     Timer_irq_enable(timer);
 
-    UserInput_init(btns);
+    UserInputs_init(btns);
     UserInputs_irq_enable(btns);
 
     while (!UART_has_data(uart));

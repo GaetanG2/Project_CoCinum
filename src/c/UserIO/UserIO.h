@@ -8,16 +8,20 @@ typedef uint32_t UserOutputs;
 
 typedef struct {
     InterruptController *intc;
-    uint32_t evt_mask;
+    InterruptController *intc_on;
+    InterruptController *intc_off;
+    uint32_t on_evt_mask;
+    uint32_t off_evt_mask;
+    uint32_t on_off_mask;
     volatile uint32_t *status;
-    volatile uint32_t *on_evt;
-    volatile uint32_t *off_evt;
 } UserInputs;
 
-void UserInput_init(UserInputs *dev);
+void UserInputs_init(UserInputs *dev);
 void UserInputs_irq_enable(UserInputs *dev);
 void UserInputs_irq_disable(UserInputs *dev);
-bool UserInputs_has_event(UserInputs *dev);
-void UserInputs_clear_event(UserInputs *dev);
+bool UserInputs_has_events(UserInputs *dev);
+void UserInputs_clear_events(UserInputs *dev);
+uint32_t UserInputs_get_on_events(UserInputs *dev);
+uint32_t UserInputs_get_off_events(UserInputs *dev);
 
 #endif

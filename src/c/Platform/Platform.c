@@ -27,11 +27,13 @@ SegmentDisplay *const display = (SegmentDisplay*)DISPLAY_ADDRESS;
 UserOutputs *const leds = (UserOutputs*)LEDS_ADDRESS;
 
 static UserInputs btns_priv = {
-    .intc = intc,
-    .evt_mask = INTC_EVENTS_BTNS,
-    .status = (uint32_t*)BTNS_ADDRESS,
-    .on_evt = (uint32_t*)BTNS_ADDRESS + 1,
-    .off_evt = (uint32_t*)BTNS_ADDRESS + 2,
+    .intc         = intc,
+    .intc_on      = (InterruptController*)BTNS_ON_ADDRESS,
+    .intc_off     = (InterruptController*)BTNS_OFF_ADDRESS,
+    .on_evt_mask  = INTC_EVENTS_BTNS_ON,
+    .off_evt_mask = INTC_EVENTS_BTNS_OFF,
+    .on_off_mask  = BTNS_ON_OFF_MASK,
+    .status       = (uint32_t*)BTNS_ADDRESS,
 };
 
 UserInputs *const btns = &btns_priv;

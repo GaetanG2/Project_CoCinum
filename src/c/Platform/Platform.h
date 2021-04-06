@@ -16,5 +16,7 @@ extern Timer               *const timer;
 extern SegmentDisplay      *const display;
 extern UserOutputs         *const leds;
 extern UserInputs          *const btns;
+extern InterruptController *const btns_on;
+extern InterruptController *const btns_off;
 
 #endif
