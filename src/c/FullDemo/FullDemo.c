@@ -1,8 +1,6 @@
 
 #include <Platform/Platform.h>
 
-#define POINT_INDEX_MAX 3
-
 static uint16_t count;
 static uint16_t points;
 static uint16_t leds_next;
