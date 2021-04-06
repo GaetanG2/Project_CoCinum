@@ -23,7 +23,7 @@ void irq_handler(void) {
 
 void main(void) {
     UART_init(uart);
-    UART_puts(uart, "Virgule says\n<< Hello! >>\nfrom C.\n");
+    UART_puts(uart, "Virgule says\n<< Hello! >>\nPress a key to terminate.\n");
 
     count  = 0;
     points = 1;
