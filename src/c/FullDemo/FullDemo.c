@@ -18,6 +18,7 @@ void irq_handler(void) {
             points = 1;
         }
         SegmentDisplay_show(display, count, points);
+        *leds = count;
     }
 }
 

@@ -23,3 +23,5 @@ static Timer timer_priv = {
 Timer *const timer = &timer_priv;
 
 SegmentDisplay *const display = (SegmentDisplay*)DISPLAY_ADDRESS;
+
+UserOutputs *const leds = (UserOutputs*)LEDS_ADDRESS;
