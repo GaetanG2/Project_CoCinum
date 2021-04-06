@@ -46,8 +46,8 @@ static void receive(void) {
     // because it may be overwritten while loading.
     UART uart = {
         .intc        = intc,
-        .rx_irq_mask = UART_RX_IRQ_MASK,
-        .tx_irq_mask = UART_TX_IRQ_MASK,
+        .rx_evt_mask = INTC_EVENTS_UART_RX,
+        .tx_evt_mask = INTC_EVENTS_UART_TX,
         .data        = (uint8_t*)UART_ADDRESS
     };
 

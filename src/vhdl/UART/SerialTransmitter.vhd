@@ -10,7 +10,7 @@ entity SerialTransmitter is
     port(
         clk_i   : in  std_logic;
         reset_i : in  std_logic;
-        start_i : in  std_logic;
+        write_i : in  std_logic;
         data_i  : in  std_logic_vector(7 downto 0);
         done_o  : out std_logic;
         data_o  : out std_logic
@@ -35,7 +35,7 @@ begin
             else
                 case state_reg is
                     when IDLE_STATE =>
-                        if start_i = '1' then
+                        if write_i = '1' then
                             state_reg <= START_STATE;
                         end if;
                     when START_STATE =>
@@ -80,7 +80,7 @@ begin
     p_data_reg : process(clk_i)
     begin
         if rising_edge(clk_i) then
-            if state_reg = IDLE_STATE and start_i = '1' then
+            if state_reg = IDLE_STATE and write_i = '1' then
                 data_reg <= data_i;
             end if;
         end if;

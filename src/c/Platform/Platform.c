@@ -6,9 +6,20 @@ InterruptController *const intc = (InterruptController*)INTC_ADDRESS;
 
 static UART uart_priv = {
     .intc        = intc,
-    .rx_irq_mask = UART_RX_IRQ_MASK,
-    .tx_irq_mask = UART_TX_IRQ_MASK,
+    .rx_evt_mask = INTC_EVENTS_UART_RX,
+    .tx_evt_mask = INTC_EVENTS_UART_TX,
     .data        = (uint8_t*)UART_ADDRESS
 };
 
 UART *const uart = &uart_priv;
+
+static Timer timer_priv = {
+    .intc     = intc,
+    .evt_mask = INTC_EVENTS_TIMER,
+    .limit    = (uint32_t*)TIMER_ADDRESS,
+    .count    = (uint32_t*)TIMER_ADDRESS + 1
+};
+
+Timer *const timer = &timer_priv;
+
+SegmentDisplay *const display = (SegmentDisplay*)DISPLAY_ADDRESS;
