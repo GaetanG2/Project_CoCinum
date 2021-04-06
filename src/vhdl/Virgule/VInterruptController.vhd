@@ -8,7 +8,7 @@ entity VInterruptController is
     port(
         clk_i     : in  std_logic;
         reset_i   : in  std_logic;
-        events_i  : in  word_t;
+        events_i  : in  std_logic_vector;
         address_i : in  std_logic;
         data_i    : in  word_t;
         data_o    : out word_t;
