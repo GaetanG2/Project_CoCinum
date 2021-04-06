@@ -20,6 +20,6 @@ bool UserInputs_has_event(UserInputs *dev) {
 
 void UserInputs_clear_event(UserInputs *dev) {
     InterruptController_clear_events(dev->intc, dev->evt_mask);
-    dev->on_evt  = -1;
-    dev->off_evt = -1;
+    *dev->on_evt  = -1;
+    *dev->off_evt = -1;
 }

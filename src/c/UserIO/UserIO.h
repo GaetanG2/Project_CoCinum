@@ -2,6 +2,8 @@
 #ifndef USER_IO_H_
 #define USER_IO_H_
 
+#include <InterruptController/InterruptController.h>
+
 typedef uint32_t UserOutputs;
 
 typedef struct {

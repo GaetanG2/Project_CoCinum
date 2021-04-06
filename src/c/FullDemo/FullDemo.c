@@ -18,7 +18,12 @@ void irq_handler(void) {
             points = 1;
         }
         SegmentDisplay_show(display, count, points);
-        *leds = count;
+        *leds = 0;
+    }
+
+    if (UserInputs_has_event(btns)) {
+        *leds = *btns->on_evt;
+        UserInputs_clear_event(btns);
     }
 }
 
@@ -33,6 +38,9 @@ void main(void) {
     Timer_init(timer);
     Timer_set_limit(timer, CLK_FREQUENCY_HZ);
     Timer_irq_enable(timer);
+
+    UserInput_init(btns);
+    UserInputs_irq_enable(btns);
 
     while (!UART_has_data(uart));
 }

@@ -6,6 +6,7 @@ C_DEPS = \
 	../UART/UART-buffered.c \
 	../Timer/Timer.c \
 	../SegmentDisplay/SegmentDisplay.c \
+	../UserIO/UserIO.c \
 	../Platform/Platform.c
 
 C_FLAGS_USER = -Os
