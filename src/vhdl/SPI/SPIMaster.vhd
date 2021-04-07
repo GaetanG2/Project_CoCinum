@@ -20,6 +20,7 @@ entity SPIMaster is
 end SPIMaster;
 
 architecture Behavioral of SPIMaster is
+    signal start         : std_logic;
     signal busy_reg      : std_logic := '0';
 
     signal polarity_reg  : std_logic := '0';
@@ -63,6 +64,8 @@ begin
                    std_logic_vector(to_unsigned(timer_max_reg, 8)) when "10",
                    "00000000"                                      when others;
 
+    start <= write_i when address_i = "00" else  '0';
+    
     p_busy_reg : process(clk_i)
     begin
         -- ...
