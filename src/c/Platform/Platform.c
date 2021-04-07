@@ -24,17 +24,35 @@ static UART uart_priv = {
 UART *const uart = &uart_priv;
 
 /* -------------------------------------------------------------------------- *
- * Timer
+ * Timers
  * -------------------------------------------------------------------------- */
 
-static Timer timer_priv = {
+static Timer timer1_priv = {
     .intc     = intc,
-    .evt_mask = INTC_EVENTS_TIMER,
-    .limit    = REG(uint32_t, TIMER_ADDRESS, TIMER_LIMIT_REG),
-    .count    = REG(uint32_t, TIMER_ADDRESS, TIMER_COUNT_REG)
+    .evt_mask = INTC_EVENTS_TIMER1,
+    .limit    = REG(uint32_t, TIMER1_ADDRESS, TIMER_LIMIT_REG),
+    .count    = REG(uint32_t, TIMER1_ADDRESS, TIMER_COUNT_REG)
 };
 
-Timer *const timer = &timer_priv;
+Timer *const timer1 = &timer1_priv;
+
+static Timer timer2_priv = {
+    .intc     = intc,
+    .evt_mask = INTC_EVENTS_TIMER2,
+    .limit    = REG(uint32_t, TIMER2_ADDRESS, TIMER_LIMIT_REG),
+    .count    = REG(uint32_t, TIMER2_ADDRESS, TIMER_COUNT_REG)
+};
+
+Timer *const timer2 = &timer2_priv;
+
+static Timer timer3_priv = {
+    .intc     = intc,
+    .evt_mask = INTC_EVENTS_TIMER3,
+    .limit    = REG(uint32_t, TIMER3_ADDRESS, TIMER_LIMIT_REG),
+    .count    = REG(uint32_t, TIMER3_ADDRESS, TIMER_COUNT_REG)
+};
+
+Timer *const timer3 = &timer3_priv;
 
 /* -------------------------------------------------------------------------- *
  * Segment display
@@ -83,3 +101,14 @@ static SPIMaster spi2_priv = {
 };
 
 SPIMaster *const spi2 = &spi2_priv;
+
+/* -------------------------------------------------------------------------- *
+ * Joystick
+ * -------------------------------------------------------------------------- */
+
+static Joystick jstk_priv = {
+    .spi   = spi1,
+    .timer = timer2
+};
+
+Joystick *const jstk = &jstk_priv;

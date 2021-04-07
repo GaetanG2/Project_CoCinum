@@ -3,9 +3,15 @@
 #define JOYSTICK_H_
 
 #include "SPI.h"
+#include <Timer/Timer.h>
 
-void Joystick_init(SPIMaster *dev);
+typedef struct {
+    SPIMaster *spi;
+    Timer *timer;
+} Joystick;
 
-void Joystick_update(SPIMaster *dev, uint8_t red, uint8_t green, uint8_t blue, uint16_t *x, uint16_t *y, bool *trigger, bool *pressed);
+void Joystick_init(Joystick *dev);
+
+void Joystick_update(Joystick *dev, uint8_t red, uint8_t green, uint8_t blue, uint16_t *x, uint16_t *y, bool *trigger, bool *pressed);
 
 #endif

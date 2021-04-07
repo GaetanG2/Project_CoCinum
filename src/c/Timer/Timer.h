@@ -22,5 +22,6 @@ void Timer_irq_enable(Timer* dev);
 void Timer_irq_disable(Timer* dev);
 bool Timer_has_event(Timer *dev);
 void Timer_clear_event(Timer *dev);
+void Timer_delay(Timer *dev);
 
 #endif
