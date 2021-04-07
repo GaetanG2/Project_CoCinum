@@ -1,7 +1,6 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-
 use ieee.numeric_std.all;
 
 entity SPIMaster is
@@ -59,10 +58,10 @@ begin
     end process p_addressable_reg;
 
     with address_i select
-        rdata_o <= data_reg                                    when "00",
-                   "00000" & polarity_reg & phase_reg & cs_reg when "01",
-                   timer_max_reg                               when "10",
-                   "00000000"                                  when others;
+        rdata_o <= data_reg                                        when "00",
+                   "00000" & polarity_reg & phase_reg & cs_reg     when "01",
+                   std_logic_vector(to_unsigned(timer_max_reg, 8)) when "10",
+                   "00000000"                                      when others;
 
     p_busy_reg : process(clk_i)
     begin
