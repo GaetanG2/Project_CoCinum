@@ -7,6 +7,9 @@ C_DEPS = \
 	../Timer/Timer.c \
 	../SegmentDisplay/SegmentDisplay.c \
 	../UserIO/UserIO.c \
+	../SPI/SPI.c \
+	../SPI/Joystick.c \
+	../SPI/Accelerometer.c \
 	../Platform/Platform.c
 
 C_FLAGS_USER = -Os

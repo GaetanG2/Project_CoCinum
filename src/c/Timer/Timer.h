@@ -4,6 +4,11 @@
 
 #include <InterruptController/InterruptController.h>
 
+enum {
+    TIMER_LIMIT_REG,
+    TIMER_COUNT_REG
+} TimerRegs;
+
 typedef struct {
     InterruptController *intc;
     uint32_t evt_mask;

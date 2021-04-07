@@ -1,24 +1,33 @@
 
 #include <Platform/Platform.h>
+#include <SPI/Joystick.h>
+#include <SPI/Accelerometer.h>
 
 static uint16_t count;
 static uint16_t points;
-static uint16_t leds_next;
+static uint16_t leds_last, leds_next;
+static uint8_t jstk_red, jstk_green, jstk_blue;
+
+static volatile bool tick;
 
 __attribute__((interrupt("machine")))
 void irq_handler(void) {
     UART_irq_handler(uart);
 
     if (Timer_has_event(timer)) {
+        tick = true;
         count ++;
         points <<= 1;
         if (points > 8) {
             points = 1;
         }
-        SegmentDisplay_show(display, count, points);
 
-        *leds = leds_next;
+        leds_last = leds_next;
         leds_next = 0;
+
+        jstk_red   = (count & 4) << 5;
+        jstk_green = (count & 2) << 6;
+        jstk_blue  = (count & 1) << 7;
 
         Timer_clear_event(timer);
     }
@@ -31,11 +40,12 @@ void irq_handler(void) {
 
 void main(void) {
     UART_init(uart);
-    UART_puts(uart, "Virgule says\n<< Hello! >>\nPress a key to terminate.\n");
+    UART_puts(uart, "Expected hardware:\nPmodA: PmodJSTK2\nPmodB: PmodACL2\nPress a key to terminate.\n");
 
     count     = 0;
     points    = 1;
-    leds_next = 0;
+    leds_last = leds_next = 0;
+    tick      = false;
 
     SegmentDisplay_show(display, count, points);
 
@@ -46,5 +56,19 @@ void main(void) {
     UserInputs_init(btns);
     UserInputs_irq_enable(btns);
 
-    while (!UART_has_data(uart));
+    Joystick_init(spi1);
+    // Accelerometer_init(spi2);
+
+    while (!UART_has_data(uart)) {
+        if (tick) {
+            tick = false;
+            SegmentDisplay_show(display, count, points);
+
+            *leds = leds_last;
+
+            uint16_t x, y;
+            bool trigger, pressed;
+            Joystick_update(spi1, jstk_red, jstk_green, jstk_blue, &x, &y, &trigger, &pressed);
+        }
+    }
 }
