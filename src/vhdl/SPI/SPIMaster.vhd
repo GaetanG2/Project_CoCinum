@@ -98,5 +98,4 @@ begin
 
     cs_n_o  <= not cs_reg;
     sclk_o  <= sclk_reg;
-    rdata_o <= data_reg;
 end Behavioral;
