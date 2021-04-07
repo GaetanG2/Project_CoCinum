@@ -13,7 +13,7 @@ entity SerialTransmitter is
         write_i : in  std_logic;
         data_i  : in  std_logic_vector(7 downto 0);
         done_o  : out std_logic;
-        data_o  : out std_logic
+        tx_o    : out std_logic
     );
 end SerialTransmitter;
 
@@ -87,9 +87,9 @@ begin
     end process p_data_reg;
 
     with state_reg select
-        data_o <= '0'                 when START_STATE,
-                  data_reg(index_reg) when DATA_STATE,
-                  '1'                 when others;
+        tx_o <= '0'                 when START_STATE,
+                data_reg(index_reg) when DATA_STATE,
+                '1'                 when others;
 
     done_o <= '1' when state_reg = STOP_STATE and timer_reg = TIMER_MAX else '0';
 end Behavioral;

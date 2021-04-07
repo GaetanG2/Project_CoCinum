@@ -10,7 +10,7 @@ entity SerialReceiver is
     port(
         clk_i   : in  std_logic;
         reset_i : in  std_logic;
-        data_i  : in  std_logic;
+        rx_i    : in  std_logic;
         data_o  : out std_logic_vector(7 downto 0);
         done_o  : out std_logic
     );
@@ -34,7 +34,7 @@ begin
             else
                 case state_reg is
                     when IDLE_STATE =>
-                        if data_i = '0' then
+                        if rx_i = '0' then
                             state_reg <= START_STATE;
                         end if;
                     when START_STATE =>
@@ -46,7 +46,7 @@ begin
                             state_reg <= STOP_STATE;
                         end if;
                     when STOP_STATE =>
-                        if data_i = '1' then
+                        if rx_i = '1' then
                             state_reg <= IDLE_STATE;
                         end if;
                 end case;
@@ -80,7 +80,7 @@ begin
     begin
         if rising_edge(clk_i) then
             if state_reg = DATA_STATE and timer_reg = TIMER_MAX / 2 then
-                data_reg(index_reg) <= data_i;
+                data_reg(index_reg) <= rx_i;
             end if;
         end if;
     end process p_data_reg;
