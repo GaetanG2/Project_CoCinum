@@ -4,14 +4,14 @@ use ieee.std_logic_1164.all;
 
 entity SPIMaster is
     port(
-        clk_i     : in std_logic;
-        reset_i   : in std_logic;
-        write_i   : in std_logic;
-        address_i : in std_logic_vector(1 downto 0);
-        wdata_i   : in std_logic_vector(7 downto 0);
+        clk_i     : in  std_logic;
+        reset_i   : in  std_logic;
+        write_i   : in  std_logic;
+        address_i : in  std_logic_vector(1 downto 0);
+        wdata_i   : in  std_logic_vector(7 downto 0);
         rdata_o   : out std_logic_vector(7 downto 0);
         done_o    : out std_logic;
-        miso_i    : in std_logic;
+        miso_i    : in  std_logic;
         mosi_o    : out std_logic;
         sclk_o    : out std_logic;
         cs_n_o    : out std_logic
@@ -33,7 +33,7 @@ architecture Behavioral of SPIMaster is
     signal sclk_cycle    : std_logic;
     signal sclk_reg      : std_logic := '0';
 begin
-    p_regs : process(clk_i)
+    p_addressable_reg : process(clk_i)
     begin
         if rising_edge(clk_i) then
             if reset_i = '1' then
@@ -50,9 +50,11 @@ begin
                     when "10" => timer_max_reg <= to_integer(unsigned(wdata_i));
                     when others =>
                 end case;
+            elsif ... then
+                data_reg <= ...;
             end if;
         end if;
-    end process p_regs;
+    end process p_addressable_reg;
 
     with address_i select
         rdata_o <= data_reg                                    when "00",
@@ -60,9 +62,40 @@ begin
                    timer_max_reg                               when "10",
                    "00000000"                                  when others;
 
-    cs_n_o <= not cs_reg;
+    p_busy_reg : process(clk_i)
+    begin
+        -- ...
+    end process p_busy_reg;
 
-    --
-    -- ...
-    --
+    p_done_o : process(clk_i)
+    begin
+        -- ...
+    end process p_done_o;
+
+    p_timer_reg : process(clk_i)
+    begin
+        -- ...
+    end process p_timer_reg;
+
+    p_bit_index_reg : process(clk_i)
+    begin
+        -- ...
+    end process p_bit_index_reg;
+
+    sclk_half  <= ...;
+    sclk_cycle <= ...;
+
+    p_sclk_reg : process(clk_i)
+    begin
+        -- ...
+    end process p_sclk_reg;
+
+    p_mosi_o : process(clk_i)
+    begin
+        -- ...
+    end process p_mosi_o;
+
+    cs_n_o  <= not cs_reg;
+    sclk_o  <= sclk_reg;
+    rdata_o <= data_reg;
 end Behavioral;
