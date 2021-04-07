@@ -27,12 +27,11 @@ architecture Behavioral of SPIMaster is
     signal timer_max_reg : integer range 0 to 255;
     signal timer_reg     : integer range 0 to 255;
     signal bit_index_reg : integer range 0 to 7;
+    signal data_reg      : std_logic_vector(7 downto 0);
 
     signal sclk_half     : std_logic;
     signal sclk_cycle    : std_logic;
-    signal sclk_reg      : std_logic := POLARITY;
-
-    signal data_reg      : std_logic_vector(DATA_WIDTH - 1 downto 0);
+    signal sclk_reg      : std_logic := '0';
 begin
     p_regs : process(clk_i)
     begin
