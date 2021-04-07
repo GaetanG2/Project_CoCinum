@@ -17,13 +17,13 @@ architecture Simulation of SPIMasterTestbench is
     constant SERIAL_CLOCK_PERIOD : time      := 1 sec / BIT_RATE_HZ;
     constant DATA_WIDTH          : positive  := 8;
     signal clk                   : std_logic := '0';
-    signal reset                 : std_logic;
-    signal start                 : std_logic;
+    signal reset                 : std_logic := '1';
+    signal write                 : std_logic := '0';
     signal done                  : std_logic;
-    signal pdata_from_slave      : std_logic_vector(DATA_WIDTH - 1 downto 0);
-    signal pdata_to_slave        : std_logic_vector(DATA_WIDTH - 1 downto 0);
-    signal sdata_from_slave      : std_logic;
-    signal sdata_to_slave        : std_logic;
+    signal rdata                 : std_logic_vector(DATA_WIDTH - 1 downto 0);
+    signal wdata                 : std_logic_vector(DATA_WIDTH - 1 downto 0);
+    signal miso                  : std_logic;
+    signal mosi                  : std_logic;
     signal sclk                  : std_logic;
 
     function to_string(slv : std_logic_vector) return string is
@@ -53,26 +53,26 @@ begin
         port map(
             clk_i   => clk,
             reset_i => reset,
-            start_i => start,
+            write_i => write,
             done_o  => done,
             sclk_o  => sclk,
-            pdata_i => pdata_to_slave,
-            sdata_o => sdata_to_slave,
-            pdata_o => pdata_from_slave,
-            sdata_i => sdata_from_slave
+            wdata_i => wdata,
+            rdata_o => rdata,
+            mosi_o  => mosi,
+            miso_i  => miso
         );
 
     clk   <= not clk after CLK_PERIOD / 2;
-    reset <= '1', '0' after CLK_PERIOD;
+    reset <= '0' after CLK_PERIOD;
 
     -- ------------------------------------------------------------------------
     -- Master to slave
     -- ------------------------------------------------------------------------
 
-    pdata_to_slave <= DATA_TO_SLAVE;
-    start          <= '0', '1' after 2 * CLK_PERIOD, '0' after 3 * CLK_PERIOD;
+    wdata <= DATA_TO_SLAVE;
+    write <= '1' after 2 * CLK_PERIOD, '0' after 3 * CLK_PERIOD;
 
-    p_check_sdata_to_slave : process
+    p_check_mosi : process
     begin
         wait until sclk = POLARITY;
 
@@ -83,15 +83,15 @@ begin
                 wait until sclk'event and sclk = POLARITY;
             end if;
 
-            assert sdata_to_slave = DATA_TO_SLAVE(i)
-                report "sdata_o: " & std_logic'image(sdata_to_slave) & "; expected: " & std_logic'image(DATA_TO_SLAVE(i))
+            assert mosi = DATA_TO_SLAVE(i)
+                report "sdata_o: " & std_logic'image(mosi) & "; expected: " & std_logic'image(DATA_TO_SLAVE(i))
                 severity ERROR;
 
-            assert sdata_to_slave'stable
+            assert mosi'stable
                 report "sdata_o: unstable"
                 severity ERROR;
         end loop;
-    end process p_check_sdata_to_slave;
+    end process p_check_mosi;
 
     p_check_sclk : process
         variable t : time;
@@ -120,29 +120,29 @@ begin
     -- Slave to master
     -- ------------------------------------------------------------------------
 
-    p_sdata_from_slave : process
+    p_miso : process
     begin
         wait until sclk = POLARITY;
 
         for i in DATA_WIDTH - 1 downto 0 loop
             if PHASE = '0' then
-                sdata_from_slave <= DATA_FROM_SLAVE(i);
+                miso <= DATA_FROM_SLAVE(i);
                 wait until sclk'event and sclk = POLARITY;
             else
                 wait until sclk'event and sclk /= POLARITY;
-                sdata_from_slave <= DATA_FROM_SLAVE(i);
+                miso <= DATA_FROM_SLAVE(i);
             end if;
         end loop;
 
         wait;
-    end process p_sdata_from_slave;
+    end process p_miso;
 
-    p_check_pdata_from_slave : process
+    p_check_rdata : process
     begin
         wait until rising_edge(clk) and done = '1';
 
-        assert pdata_from_slave = DATA_FROM_SLAVE
-            report "pdata_o : " & to_string(pdata_from_slave) & "; expected: " & to_string(DATA_FROM_SLAVE)
+        assert rdata = DATA_FROM_SLAVE
+            report "pdata_o : " & to_string(rdata) & "; expected: " & to_string(DATA_FROM_SLAVE)
             severity ERROR;
-    end process p_check_pdata_from_slave;
+    end process p_check_rdata;
 end Simulation;
