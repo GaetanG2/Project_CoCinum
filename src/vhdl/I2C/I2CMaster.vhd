@@ -10,15 +10,16 @@ entity I2CMaster is
         I2C_FREQUENCY_HZ : positive := 100e3
     );
     port(
-        clk_i   : in    std_logic;
-        reset_i : in    std_logic;
-        write_i : in    std_logic;
-        wdata_i : in    word_t;
-        rdata_o : out   word_t;
-        done_o  : out   std_logic;
-        error_o : out   std_logic;
-        scl_io  : inout std_logic;
-        sda_io  : inout std_logic
+        clk_i     : in    std_logic;
+        reset_i   : in    std_logic;
+        write_i   : in    std_logic;
+        address_i : in    std_logic;
+        wdata_i   : in    word_t;
+        rdata_o   : out   word_t;
+        done_o    : out   std_logic;
+        error_o   : out   std_logic;
+        scl_io    : inout std_logic;
+        sda_io    : inout std_logic
     );
 end I2CMaster;
 
@@ -67,7 +68,7 @@ begin
         if rising_edge(clk_i) then
             if write_i = '1' and state_reg = IDLE then
                 if address_i = '0' then
-                    data_reg          <= wdata_i;
+                    buffer_reg(wdata_i'range) <= wdata_i;
                 else
                     send_len_reg      <= to_integer(unsigned(wdata_i(14 downto 12)));
                     recv_len_reg      <= to_integer(unsigned(wdata_i(10 downto 8)));
@@ -386,7 +387,6 @@ begin
                         else
                             buffer_reg(BUFFER_LEN - 8) <= '0'; -- Write
                         end if;
-                        buffer_reg(data_reg'range) <= data_reg;
                     end if;
 
                 when REPEATED_START_CONDITION =>
