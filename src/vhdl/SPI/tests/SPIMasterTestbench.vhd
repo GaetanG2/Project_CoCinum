@@ -116,7 +116,7 @@ begin
     begin
         wait until cs_n = '0';
 
-        for i in DATA_WIDTH - 1 downto 0 loop
+        for i in 7 downto 0 loop
             if PHASE = '0' then
                 wait until sclk'event and sclk /= POLARITY;
             else
@@ -144,7 +144,7 @@ begin
         wait until sclk'event;
         t := now;
 
-        for i in 1 to 2 * DATA_WIDTH - 1 loop
+        for i in 1 to 15 loop
             wait until sclk'event;
 
             assert now = t + SERIAL_CLOCK_PERIOD / 2
@@ -159,7 +159,7 @@ begin
     begin
         wait until cs_n = '0';
 
-        for i in DATA_WIDTH - 1 downto 0 loop
+        for i in 7 downto 0 loop
             if PHASE = '0' then
                 miso <= DATA_FROM_SLAVE(i);
                 wait until sclk'event and sclk = POLARITY;
