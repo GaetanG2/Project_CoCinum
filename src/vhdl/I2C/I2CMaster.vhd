@@ -379,9 +379,9 @@ begin
                     -- the data to send.
                     if start = '1' then
                         if send_len_reg = 0 then
-                            rw <= '1'; -- Read
+                            rw := '1'; -- Read
                         else
-                            rw <= '0'; -- Write
+                            rw := '0'; -- Write
                         end if;
                         buffer_reg <= slave_address_reg & rw & wdata_i;
                     end if;
