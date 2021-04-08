@@ -7,7 +7,8 @@
 static uint16_t count;
 static uint16_t points;
 static uint16_t leds_last, leds_next;
-static uint8_t jstk_red, jstk_green, jstk_blue;
+static JoystickState jstk_state;
+static AccelerometerState acl_state;
 
 static volatile bool tick;
 
@@ -15,7 +16,7 @@ __attribute__((interrupt("machine")))
 void irq_handler(void) {
     UART_irq_handler(uart);
 
-    if (Timer_has_event(timer1)) {
+    if (Timer_has_event(timer3)) {
         tick = true;
         count ++;
         points <<= 1;
@@ -26,11 +27,11 @@ void irq_handler(void) {
         leds_last = leds_next;
         leds_next = 0;
 
-        jstk_red   = (count & 4) << 5;
-        jstk_green = (count & 2) << 6;
-        jstk_blue  = (count & 1) << 7;
+        jstk_state.red   = (count & 4) << 5;
+        jstk_state.green = (count & 2) << 6;
+        jstk_state.blue  = (count & 1) << 7;
 
-        Timer_clear_event(timer1);
+        Timer_clear_event(timer3);
     }
 
     if (UserInputs_has_events(btns)) {
@@ -65,15 +66,15 @@ void main(void) {
 
     SegmentDisplay_show(display, count, points);
 
-    Timer_init(timer1);
-    Timer_set_limit(timer1, CLK_FREQUENCY_HZ / 2);
-    Timer_irq_enable(timer1);
+    Timer_init(timer3);
+    Timer_set_limit(timer3, CLK_FREQUENCY_HZ / 2);
+    Timer_irq_enable(timer3);
 
     UserInputs_init(btns);
     UserInputs_irq_enable(btns);
 
     Joystick_init(jstk);
-    // Accelerometer_init(spi2);
+    Accelerometer_init(acl);
 
     while (!UART_has_data(uart)) {
         if (tick) {
@@ -82,20 +83,29 @@ void main(void) {
 
             *leds = leds_last;
 
-            uint16_t x, y;
-            bool trigger, pressed;
-            Joystick_update(jstk, jstk_red, jstk_green, jstk_blue, &x, &y, &trigger, &pressed);
+            Joystick_update(jstk, &jstk_state);
 
-            UART_puts(uart, "x=");
-            print_hex(x, sizeof(x));
+            UART_puts(uart, "Joystick: x=");
+            print_hex(jstk_state.x, sizeof(jstk_state.x));
             UART_puts(uart, " y=");
-            print_hex(y, sizeof(y));
-            if (trigger) {
+            print_hex(jstk_state.y, sizeof(jstk_state.y));
+            if (jstk_state.trigger) {
                 UART_puts(uart, " T");
             }
-            if (pressed) {
+            if (jstk_state.pressed) {
                 UART_puts(uart, " J");
             }
+            UART_putc(uart, '\n');
+
+            Accelerometer_update(acl, &acl_state);
+            UART_puts(uart, "Accelerometer: x=");
+            print_hex(acl_state.x, sizeof(acl_state.x));
+            UART_puts(uart, " y=");
+            print_hex(acl_state.y, sizeof(acl_state.y));
+            UART_puts(uart, " z=");
+            print_hex(acl_state.z, sizeof(acl_state.z));
+            UART_puts(uart, " t=");
+            print_hex(acl_state.t, sizeof(acl_state.t));
             UART_putc(uart, '\n');
         }
     }

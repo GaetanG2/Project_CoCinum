@@ -10,6 +10,7 @@
 #include <UserIO/UserIO.h>
 #include <SPI/SPI.h>
 #include <SPI/Joystick.h>
+#include <SPI/Accelerometer.h>
 
 extern InterruptController *const intc;
 extern UART                *const uart;
@@ -23,5 +24,7 @@ extern InterruptController *const btns_on;
 extern InterruptController *const btns_off;
 extern SPIMaster           *const spi1;
 extern SPIMaster           *const spi2;
-extern Joystick            *const jstk;
+extern SPIDevice           *const jstk;
+extern SPIDevice           *const acl;
+
 #endif

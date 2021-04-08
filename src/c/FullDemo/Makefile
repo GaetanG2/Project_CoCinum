@@ -2,6 +2,7 @@
 MEM_SIZE = 65536
 
 C_DEPS = \
+	../Memory/Memory.c \
 	../InterruptController/InterruptController.c \
 	../UART/UART-buffered.c \
 	../Timer/Timer.c \

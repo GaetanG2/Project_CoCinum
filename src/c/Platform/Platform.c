@@ -103,12 +103,27 @@ static SPIMaster spi2_priv = {
 SPIMaster *const spi2 = &spi2_priv;
 
 /* -------------------------------------------------------------------------- *
- * Joystick
+ * Joystick and accelerometer
  * -------------------------------------------------------------------------- */
 
-static Joystick jstk_priv = {
-    .spi   = spi1,
-    .timer = timer2
+static SPIDevice jstk_priv = {
+    .spi            = spi1,
+    .timer          = timer1,
+    .polarity       = 0,
+    .phase          = 0,
+    .cycles_per_bit = CLK_FREQUENCY_HZ / 1000000, // 1 Mbit/sec
+    .cycles_per_gap = CLK_FREQUENCY_HZ / 25000    // 40us (> 25 us)
 };
 
-Joystick *const jstk = &jstk_priv;
+SPIDevice *const jstk = &jstk_priv;
+
+static SPIDevice acl_priv = {
+    .spi            = spi2,
+    .timer          = timer2,
+    .polarity       = 0,
+    .phase          = 0,
+    .cycles_per_bit = CLK_FREQUENCY_HZ / 2000000, // 2 Mbit/sec
+    .cycles_per_gap = CLK_FREQUENCY_HZ / 5000000  // 200ns (> 100 ns)
+};
+
+SPIDevice *const acl = &acl_priv;
