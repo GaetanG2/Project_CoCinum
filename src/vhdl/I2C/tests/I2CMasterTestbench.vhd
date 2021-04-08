@@ -78,7 +78,8 @@ begin
 
         -- Set data to send and start transaction.
         wait until rising_edge(clk);
-        wdata <= SEND_DATA;
+        address <= '0';
+        wdata   <= SEND_DATA;
 
         wait until rising_edge(clk);
         write <= '0';
