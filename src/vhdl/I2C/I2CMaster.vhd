@@ -74,7 +74,7 @@ begin
         end if;
     end process p_addressable_reg;
 
-    rdata_o <= "00000000" & buffer_reg(23 downto 0);
+    rdata_o <= buffer_reg(rdata_o'range);
 
     -- Drive the open-drain outputs to SCL and SDA.
     scl_io <= '0' when scl_o = '0' else 'Z';
