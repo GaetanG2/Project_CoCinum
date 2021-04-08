@@ -66,14 +66,10 @@ begin
     p_addressable_reg : process(clk_i)
     begin
         if rising_edge(clk_i) then
-            if write_i = '1' and state_reg = IDLE then
-                if address_i = '0' then
-                    buffer_reg(wdata_i'range) <= wdata_i;
-                else
-                    send_len_reg      <= to_integer(unsigned(wdata_i(14 downto 12)));
-                    recv_len_reg      <= to_integer(unsigned(wdata_i(10 downto 8)));
-                    slave_address_reg <= wdata_i(6 downto 0);
-                end if;
+            if write_i = '1' and address_i = '1' and state_reg = IDLE then
+                send_len_reg      <= to_integer(unsigned(wdata_i(14 downto 12)));
+                recv_len_reg      <= to_integer(unsigned(wdata_i(10 downto 8)));
+                slave_address_reg <= wdata_i(6 downto 0);
             end if;
         end if;
     end process p_addressable_reg;
@@ -373,6 +369,7 @@ begin
     -- The data buffer is implemented as a shift register that contains the
     -- data to send and the received data.
     p_buffer_reg : process(clk_i)
+        variable rw : std_logic;
     begin
         if rising_edge(clk_i) then
             case state_reg is
@@ -381,16 +378,16 @@ begin
                     -- with the slave address, a direction bit, and a copy of
                     -- the data to send.
                     if start = '1' then
-                        buffer_reg(BUFFER_LEN - 1 downto BUFFER_LEN - 7) <= slave_address_reg;
                         if send_len_reg = 0 then
-                            buffer_reg(BUFFER_LEN - 8) <= '1'; -- Read
+                            rw <= '1'; -- Read
                         else
-                            buffer_reg(BUFFER_LEN - 8) <= '0'; -- Write
+                            rw <= '0'; -- Write
                         end if;
+                        buffer_reg <= slave_address_reg & rw & wdata_i;
                     end if;
 
                 when REPEATED_START_CONDITION =>
-                    -- On a repeated start condition, the buffer is filled with
+                    -- On a repeated start condition, the buffer is updated with
                     -- the slave address and a direction bit in read mode.
                     buffer_reg(BUFFER_LEN - 1 downto BUFFER_LEN - 8) <= slave_address_reg & '1';
 
