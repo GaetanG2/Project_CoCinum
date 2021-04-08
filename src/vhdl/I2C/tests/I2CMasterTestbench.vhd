@@ -11,6 +11,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.Virgule_pkg.all;
+
 architecture Simulation of I2CMasterTestbench is
     constant CLK_FREQUENCY_HZ             : positive                     := 50e6;
     constant I2C_FREQUENCY_HZ             : positive                     := 100e3;
