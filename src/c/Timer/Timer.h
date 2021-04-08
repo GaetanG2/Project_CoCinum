@@ -18,9 +18,9 @@ typedef struct {
 
 void Timer_init(Timer *dev);
 void Timer_set_limit(Timer *dev, uint32_t limit);
-void Timer_irq_enable(Timer* dev);
-void Timer_irq_disable(Timer* dev);
-bool Timer_has_event(Timer *dev);
+void Timer_enable_interrupts(Timer* dev);
+void Timer_disable_interrupts(Timer* dev);
+bool Timer_has_events(Timer *dev);
 void Timer_clear_event(Timer *dev);
 void Timer_delay(Timer *dev);
 

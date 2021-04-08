@@ -2,17 +2,17 @@
 #include "UserIO.h"
 
 void UserInputs_init(UserInputs *dev) {
-    UserInputs_irq_disable(dev);
+    UserInputs_disable_interrupts(dev);
     UserInputs_clear_events(dev);
 }
 
-void UserInputs_irq_enable(UserInputs *dev) {
+void UserInputs_enable_interrupts(UserInputs *dev) {
     InterruptController_enable(dev->intc,     dev->on_evt_mask | dev->off_evt_mask);
     InterruptController_enable(dev->intc_on,  dev->on_off_mask);
     InterruptController_enable(dev->intc_off, dev->on_off_mask);
 }
 
-void UserInputs_irq_disable(UserInputs *dev) {
+void UserInputs_disable_interrupts(UserInputs *dev) {
     InterruptController_disable(dev->intc_on,  dev->on_off_mask);
     InterruptController_disable(dev->intc_off, dev->on_off_mask);
     InterruptController_disable(dev->intc,     dev->on_evt_mask | dev->off_evt_mask);

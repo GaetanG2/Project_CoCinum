@@ -16,7 +16,7 @@ __attribute__((interrupt("machine")))
 void irq_handler(void) {
     UART_irq_handler(uart);
 
-    if (Timer_has_event(timer3)) {
+    if (Timer_has_events(timer3)) {
         tick = true;
         count ++;
         points <<= 1;
@@ -68,10 +68,10 @@ void main(void) {
 
     Timer_init(timer3);
     Timer_set_limit(timer3, CLK_FREQUENCY_HZ / 2);
-    Timer_irq_enable(timer3);
+    Timer_enable_interrupts(timer3);
 
     UserInputs_init(btns);
-    UserInputs_irq_enable(btns);
+    UserInputs_enable_interrupts(btns);
 
     Joystick_init(jstk);
     Accelerometer_init(acl);

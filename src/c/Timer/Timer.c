@@ -14,19 +14,19 @@ void Timer_set_limit(Timer *dev, uint32_t limit) {
 void Timer_delay(Timer *dev) {
     Timer_clear_event(dev);
     *dev->count = 0;
-    while (!Timer_has_event(dev));
+    while (!Timer_has_events(dev));
     Timer_clear_event(dev);
 }
 
-void Timer_irq_enable(Timer* dev) {
+void Timer_enable_interrupts(Timer* dev) {
     InterruptController_enable(dev->intc, dev->evt_mask);
 }
 
-void Timer_irq_disable(Timer* dev) {
+void Timer_disable_interrupts(Timer* dev) {
     InterruptController_disable(dev->intc, dev->evt_mask);
 }
 
-bool Timer_has_event(Timer *dev) {
+bool Timer_has_events(Timer *dev) {
     return InterruptController_has_events(dev->intc, dev->evt_mask);
 }
 

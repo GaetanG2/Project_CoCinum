@@ -17,8 +17,8 @@ typedef struct {
 } UserInputs;
 
 void UserInputs_init(UserInputs *dev);
-void UserInputs_irq_enable(UserInputs *dev);
-void UserInputs_irq_disable(UserInputs *dev);
+void UserInputs_enable_interrupts(UserInputs *dev);
+void UserInputs_disable_interrupts(UserInputs *dev);
 bool UserInputs_has_events(UserInputs *dev);
 void UserInputs_clear_events(UserInputs *dev);
 uint32_t UserInputs_get_on_events(UserInputs *dev);
