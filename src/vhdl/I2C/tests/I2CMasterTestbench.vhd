@@ -145,7 +145,7 @@ begin
                 -- Receive data byte
                 for j in 0 to 7 loop
                     wait until rising_edge(scl_bin);
-                    assert sda_bin = SEND_DATA(23 - i * 8 - j)
+                    assert sda_bin = SEND_DATA(SEND_DATA'left - i * 8 - j)
                         report "Data bit not transmitted correctly"
                         severity WARNING;
                 end loop;
