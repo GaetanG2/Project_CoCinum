@@ -17,7 +17,7 @@ architecture Simulation of I2CMasterTestbench is
     constant CLK_FREQUENCY_HZ             : positive                     := 50e6;
     constant I2C_FREQUENCY_HZ             : positive                     := 100e3;
     constant SLAVE_ADDRESS                : std_logic_vector(6 downto 0) := "0101010";
-    constant SEND_DATA                    : word_t                       := "1100101010010110010100110101";
+    constant SEND_DATA                    : word_t                       := "10110010101001011001010011010100";
     constant RECV_DATA                    : word_t                       := not SEND_DATA;
     constant SEND_LEN                     : integer                      := 1;
     constant RECV_LEN                     : integer                      := 0;
