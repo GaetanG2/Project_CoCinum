@@ -19,8 +19,8 @@ architecture Simulation of I2CMasterTestbench is
     constant SLAVE_ADDRESS                : std_logic_vector(6 downto 0) := "0101010";
     constant SEND_DATA                    : word_t                       := "10110010101001011001010011010100";
     constant RECV_DATA                    : word_t                       := not SEND_DATA;
-    constant SEND_LEN                     : integer                      := 1;
-    constant RECV_LEN                     : integer                      := 0;
+    constant SEND_LEN                     : integer                      := 4;
+    constant RECV_LEN                     : integer                      := 4;
     constant CLK_PERIOD                   : time                         := 1 sec / CLK_FREQUENCY_HZ;
     constant BIT_PERIOD                   : time                         := 1 sec / I2C_FREQUENCY_HZ;
     constant TIMEOUT                      : time                         := (SEND_LEN + RECV_LEN + 3) * 15 * BIT_PERIOD;
