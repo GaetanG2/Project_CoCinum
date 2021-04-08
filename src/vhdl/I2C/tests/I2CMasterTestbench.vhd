@@ -47,6 +47,7 @@ begin
         )
         port map(
             clk_i     => clk,
+            reset_i   => reset,
             write_i   => write,
             address_i => address,
             wdata_i   => wdata,
