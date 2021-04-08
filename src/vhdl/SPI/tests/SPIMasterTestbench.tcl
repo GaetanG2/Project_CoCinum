@@ -9,6 +9,8 @@ if {[current_sim] ne ""} {
     close_sim -force
 }
 
+set_property top SPIMasterTestbench [get_filesets sim_1]
+
 # Start the simulator.
 launch_simulation -simset sim_1 -mode behavioral
 restart

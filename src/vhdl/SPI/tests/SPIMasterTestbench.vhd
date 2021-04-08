@@ -14,17 +14,18 @@ use work.SPIMasterTestbench_pkg.all;
 
 architecture Simulation of SPIMasterTestbench is
     constant CLK_PERIOD          : time      := 1 sec / CLK_FREQUENCY_HZ;
-    constant SERIAL_CLOCK_PERIOD : time      := 1 sec / BIT_RATE_HZ;
-    constant DATA_WIDTH          : positive  := 8;
+    constant SERIAL_CLOCK_PERIOD : time      := CYCLES_PER_BIT * CLK_PERIOD;
     signal clk                   : std_logic := '0';
     signal reset                 : std_logic := '1';
     signal write                 : std_logic := '0';
+    signal address               : std_logic_vector(1 downto 0);
+    signal wdata                 : std_logic_vector(7 downto 0);
+    signal rdata                 : std_logic_vector(7 downto 0);
     signal done                  : std_logic;
-    signal rdata                 : std_logic_vector(DATA_WIDTH - 1 downto 0);
-    signal wdata                 : std_logic_vector(DATA_WIDTH - 1 downto 0);
     signal miso                  : std_logic;
     signal mosi                  : std_logic;
     signal sclk                  : std_logic;
+    signal cs_n                  : std_logic;
 
     function to_string(slv : std_logic_vector) return string is
         variable img    : string(1 to 3);
@@ -43,23 +44,18 @@ architecture Simulation of SPIMasterTestbench is
     end to_string;
 begin
     master_inst : entity work.SPIMaster
-        generic map(
-            CLK_FREQUENCY_HZ => CLK_FREQUENCY_HZ,
-            BIT_RATE_HZ      => BIT_RATE_HZ,
-            DATA_WIDTH       => DATA_WIDTH,
-            POLARITY         => POLARITY,
-            PHASE            => PHASE
-        )
         port map(
             clk_i   => clk,
             reset_i => reset,
             write_i => write,
-            done_o  => done,
-            sclk_o  => sclk,
+            address_i => address,
             wdata_i => wdata,
             rdata_o => rdata,
+            done_o  => done,
             mosi_o  => mosi,
-            miso_i  => miso
+            miso_i  => miso,
+            sclk_o  => sclk,
+            cs_n_o  => cs_n
         );
 
     clk   <= not clk after CLK_PERIOD / 2;
@@ -69,12 +65,54 @@ begin
     -- Master to slave
     -- ------------------------------------------------------------------------
 
-    wdata <= DATA_TO_SLAVE;
-    write <= '1' after 2 * CLK_PERIOD, '0' after 3 * CLK_PERIOD;
+    p_master : process
+    begin
+        -- Configure serial communication speed.
+        wait until rising_edge(clk) and reset = '0';
+        assert cs_n = '1'
+            report "cs_n: " & std_logic'image(cs_n) & "; expected: '1'"
+            severity ERROR;
+
+        address <= "10";
+        wdata   <= std_logic_vector(to_unsigned(CYCLES_PER_BIT - 1, 8));
+        write   <= '1';
+
+        -- Configure polarity and phase, select device.
+        wait until rising_edge(clk);
+        address <= "01";
+        wdata   <= "00000" & POLARITY & PHASE & '1';
+
+        -- Send a byte.
+        wait until rising_edge(clk);
+        address <= "00";
+        wdata   <= DATA_TO_SLAVE;
+
+        wait until rising_edge(clk);
+        write   <= '0';
+
+        assert cs_n = '0'
+            report "cs_n: " & std_logic'image(cs_n) & "; expected: '0'"
+            severity ERROR;
+
+        -- Check received data
+        wait until rising_edge(clk) and done = '1';
+        assert rdata = DATA_FROM_SLAVE
+            report "rpdata: " & to_string(rdata) & "; expected: " & to_string(DATA_FROM_SLAVE)
+            severity ERROR;
+
+        -- Deselect device.
+        wait until rising_edge(clk);
+        address <= "01";
+        wdata   <= "00000" & POLARITY & PHASE & '0';
+        write   <= '1';
+
+        wait until rising_edge(clk);
+        write   <= '0';
+    end process p_master;
 
     p_check_mosi : process
     begin
-        wait until sclk = POLARITY;
+        wait until cs_n = '0';
 
         for i in DATA_WIDTH - 1 downto 0 loop
             if PHASE = '0' then
@@ -84,11 +122,11 @@ begin
             end if;
 
             assert mosi = DATA_TO_SLAVE(i)
-                report "sdata_o: " & std_logic'image(mosi) & "; expected: " & std_logic'image(DATA_TO_SLAVE(i))
+                report "mosi: " & std_logic'image(mosi) & "; expected: " & std_logic'image(DATA_TO_SLAVE(i))
                 severity ERROR;
 
             assert mosi'stable
-                report "sdata_o: unstable"
+                report "mosi: unstable"
                 severity ERROR;
         end loop;
     end process p_check_mosi;
@@ -96,10 +134,9 @@ begin
     p_check_sclk : process
         variable t : time;
     begin
-        wait until sclk /= 'U';
-
+        wait until cs_n = '0';
         assert sclk = POLARITY
-            report "sclk_o: " & std_logic'image(sclk) & "; expected: " & std_logic'image(POLARITY)
+            report "sclk: " & std_logic'image(sclk) & "; expected: " & std_logic'image(POLARITY)
             severity ERROR;
 
         wait until sclk'event;
@@ -109,20 +146,16 @@ begin
             wait until sclk'event;
 
             assert now = t + SERIAL_CLOCK_PERIOD / 2
-                report "sclk_o, invalid period: " & time'image((now - t) * 2) & "; expected: " & time'image(SERIAL_CLOCK_PERIOD)
+                report "sclk, invalid period: " & time'image((now - t) * 2) & "; expected: " & time'image(SERIAL_CLOCK_PERIOD)
                 severity ERROR;
 
             t := now;
         end loop;
     end process p_check_sclk;
 
-    -- ------------------------------------------------------------------------
-    -- Slave to master
-    -- ------------------------------------------------------------------------
-
     p_miso : process
     begin
-        wait until sclk = POLARITY;
+        wait until cs_n = '0';
 
         for i in DATA_WIDTH - 1 downto 0 loop
             if PHASE = '0' then
@@ -136,13 +169,4 @@ begin
 
         wait;
     end process p_miso;
-
-    p_check_rdata : process
-    begin
-        wait until rising_edge(clk) and done = '1';
-
-        assert rdata = DATA_FROM_SLAVE
-            report "pdata_o : " & to_string(rdata) & "; expected: " & to_string(DATA_FROM_SLAVE)
-            severity ERROR;
-    end process p_check_rdata;
 end Simulation;
