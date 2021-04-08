@@ -1,6 +1,6 @@
 
 --
--- Copyright (C), 2020, ESEO
+-- Copyright (C), 2021, ESEO
 -- Guillaume Savaton <guillaume.savaton@eseo.fr>
 --
 
@@ -10,7 +10,6 @@ end SPIMasterTestbench;
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-
 
 use work.SPIMasterTestbench_pkg.all;
 
@@ -61,11 +60,7 @@ begin
         );
 
     clk   <= not clk after CLK_PERIOD / 2;
-    reset <= '0' after CLK_PERIOD;
-
-    -- ------------------------------------------------------------------------
-    -- Master to slave
-    -- ------------------------------------------------------------------------
+    reset <= '0'     after CLK_PERIOD;
 
     p_master : process
     begin

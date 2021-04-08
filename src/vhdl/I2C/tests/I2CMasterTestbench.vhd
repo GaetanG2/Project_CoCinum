@@ -1,175 +1,203 @@
---
--- Banc de test du ma�tre I2C
---
--- Auteur   : Guillaume SAVATON
--- R�vision : 11 janvier 2013
---
 
-library ieee;
-use ieee.std_logic_1164.all;
+--
+-- Copyright (C), 2021, ESEO
+-- Guillaume Savaton <guillaume.savaton@eseo.fr>
+--
 
 entity I2CMasterTestbench is
 end I2CMasterTestbench;
 
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
 architecture Simulation of I2CMasterTestbench is
-    constant CLK_FREQUENCY_HZ : positive := 50e6;
-    constant I2C_FREQUENCY_HZ : positive := 100e3;
-    constant SLAVE_ADDRESS : std_logic_vector(6 downto 0) := "0101010";
-    constant TX_PDATA : std_logic_vector(23 downto 0) := "110010101001011001010011";
-    constant RX_PDATA : std_logic_vector(23 downto 0) := not TX_PDATA;
-    constant TX_LENGTH : integer := 1;
-    constant RX_LENGTH : integer := 0;
-    constant CLK_PERIOD : time := 1 sec / CLK_FREQUENCY_HZ;
-    constant BIT_PERIOD : time := 1 sec / I2C_FREQUENCY_HZ;
-    constant TIMEOUT : time := (TX_LENGTH + RX_LENGTH + 3) * 15 * BIT_PERIOD;
-    constant START_TIME : time := 2 * BIT_PERIOD + 0.7 * CLK_PERIOD;
-    constant ACKNOWLEDGE_WRITE_ADDRESS : boolean := true;
-    constant ACKNOWLEDGE_WRITE_DATA : boolean := true;
-    constant ACKNOWLEDGE_READ_ADDRESS : boolean := true;
-    constant OTHER_SERIAL_CLOCK : boolean := true;
-    constant OTHER_SERIAL_CLOCK_HIGH_TIME : time := BIT_PERIOD * 3 / 4;
-    constant OTHER_SERIAL_CLOCK_LOW_TIME : time := BIT_PERIOD * 3 / 4;
+    constant CLK_FREQUENCY_HZ             : positive                     := 50e6;
+    constant I2C_FREQUENCY_HZ             : positive                     := 100e3;
+    constant SLAVE_ADDRESS                : std_logic_vector(6 downto 0) := "0101010";
+    constant SEND_DATA                    : word_t                       := "1100101010010110010100110101";
+    constant RECV_DATA                    : word_t                       := not SEND_DATA;
+    constant SEND_LEN                     : integer                      := 1;
+    constant RECV_LEN                     : integer                      := 0;
+    constant CLK_PERIOD                   : time                         := 1 sec / CLK_FREQUENCY_HZ;
+    constant BIT_PERIOD                   : time                         := 1 sec / I2C_FREQUENCY_HZ;
+    constant TIMEOUT                      : time                         := (SEND_LEN + RECV_LEN + 3) * 15 * BIT_PERIOD;
+    constant ACKNOWLEDGE_WRITE_ADDRESS    : boolean                      := true;
+    constant ACKNOWLEDGE_WRITE_DATA       : boolean                      := true;
+    constant ACKNOWLEDGE_READ_ADDRESS     : boolean                      := true;
+    constant OTHER_SERIAL_CLOCK           : boolean                      := true;
+    constant OTHER_SERIAL_CLOCK_HIGH_TIME : time                         := BIT_PERIOD * 3 / 4;
+    constant OTHER_SERIAL_CLOCK_LOW_TIME  : time                         := BIT_PERIOD * 3 / 4;
 
-    signal clk_sim : std_logic := '0';
-    signal start_sim, done_sim, error_sim, sclk_sim, sdata_sim : std_logic;
-    signal sclk_bin, sdata_bin : std_logic;
-    signal rx_pdata_sim : std_logic_vector(23 downto 0);
+    signal clk              : std_logic := '0';
+    signal reset            : std_logic := '1';
+    signal write            : std_logic;
+    signal address          : std_logic;
+    signal wdata, rdata     : word_t;
+    signal done, err        : std_logic;
+    signal scl, sda         : std_logic;
+    signal scl_bin, sda_bin : std_logic;
 begin
-    clk_sim <= not clk_sim after CLK_PERIOD / 2;
-
-    start_sim <= '0', '1' after START_TIME, '0' after (START_TIME + CLK_PERIOD);
-
     master_inst : entity work.I2CMaster
         generic map(
             CLK_FREQUENCY_HZ => CLK_FREQUENCY_HZ,
             I2C_FREQUENCY_HZ => I2C_FREQUENCY_HZ
         )
         port map(
-            clk_i       => clk_sim,
-            start_i     => start_sim,
-            done_o      => done_sim,
-            error_o     => error_sim,
-            address_i   => SLAVE_ADDRESS,
-            tx_length_i => TX_LENGTH,
-            rx_length_i => RX_LENGTH,
-            tx_pdata_i  => TX_PDATA,
-            rx_pdata_o  => rx_pdata_sim,
-            sdata_io    => sdata_sim,
-            sclk_io     => sclk_sim
+            clk_i     => clk,
+            write_i   => write,
+            address_i => address,
+            wdata_i   => wdata,
+            rdata_o   => rdata,
+            done_o    => done,
+            error_o   => err,
+            sda_io    => sda,
+            scl_io    => scl
         );
 
-    sdata_sim <= 'H';
-    sclk_sim  <= 'H';
-    sclk_bin    <= to_X01(sclk_sim);
-    sdata_bin   <= to_X01(sdata_sim);
+    clk   <= not clk after CLK_PERIOD / 2;
+    reset <= '0'     after CLK_PERIOD;
+
+    sda     <= 'H';
+    scl     <= 'H';
+    scl_bin <= to_X01(scl);
+    sda_bin <= to_X01(sda);
+
+    p_master : process
+    begin
+        -- Set lengths and slave address.
+        wait until rising_edge(clk) and reset = '0';
+        address <= '1';
+        wdata(15 downto 0) <= std_logic_vector(to_unsigned(SEND_LEN, 4)) &
+                              std_logic_vector(to_unsigned(RECV_LEN, 4)) &
+                              '0' & SLAVE_ADDRESS;
+        write <= '1';
+
+        -- Set data to send and start transaction.
+        wait until rising_edge(clk);
+        wdata <= SEND_DATA;
+
+        wait until rising_edge(clk);
+        write <= '0';
+
+        wait until rising_edge(clk) and (done = '1' or err = '1');
+        if err = '1' then
+            report "I2C error";
+        elsif RECV_LEN > 0 then
+            assert rdata = RECV_DATA
+                report "rdata"
+                severity ERROR;
+        end if;
+        report "Done" severity FAILURE;
+    end process p_master;
 
     process
     begin
-        sclk_sim <= 'Z';
-        wait until sclk_bin = '0';
+        scl <= 'Z';
+        wait until scl_bin = '0';
         loop
             if OTHER_SERIAL_CLOCK then
-                sclk_sim <= '0';
+                scl <= '0';
             end if;
             wait for OTHER_SERIAL_CLOCK_LOW_TIME;
-            sclk_sim <= 'Z';
-            wait until sclk_bin = '1';
+            scl <= 'Z';
+            wait until scl_bin = '1';
             wait for OTHER_SERIAL_CLOCK_HIGH_TIME;
         end loop;
     end process;
 
     process
     begin
-        sdata_sim <= 'Z';
+        sda <= 'Z';
 
-        if TX_LENGTH > 0 then
+        if SEND_LEN > 0 then
             -- Start condition
-            wait until sdata_bin = '0' and sclk_bin = '1';
+            wait until sda_bin = '0' and scl_bin = '1';
 
             -- Receive slave address
             for i in 6 downto 0 loop
-                wait until rising_edge(sclk_bin);
-                assert sdata_bin = SLAVE_ADDRESS(i)
+                wait until rising_edge(scl_bin);
+                assert sda_bin = SLAVE_ADDRESS(i)
                     report "Slave address not transmitted correctly"
                     severity WARNING;
             end loop;
 
             -- Receive direction
-            wait until rising_edge(sclk_bin);
-            assert sdata_bin = '0' -- Transmission
+            wait until rising_edge(scl_bin);
+            assert sda_bin = '0' -- Transmission
                 report "Wrong R/W"
                 severity WARNING;
 
             -- Acknowledge
-            wait until falling_edge(sclk_bin);
+            wait until falling_edge(scl_bin);
             if ACKNOWLEDGE_WRITE_ADDRESS then
-                sdata_sim <= '0';
+                sda <= '0';
             end if;
-            wait until rising_edge(sclk_bin);
-            wait until falling_edge(sclk_bin);
-            sdata_sim <= 'Z';
+            wait until rising_edge(scl_bin);
+            wait until falling_edge(scl_bin);
+            sda <= 'Z';
 
-            for i in 0 to TX_LENGTH-1 loop
+            for i in 0 to SEND_LEN-1 loop
                 -- Receive data byte
                 for j in 0 to 7 loop
-                    wait until rising_edge(sclk_bin);
-                    assert sdata_bin = TX_PDATA(23 - i * 8 - j)
+                    wait until rising_edge(scl_bin);
+                    assert sda_bin = SEND_DATA(23 - i * 8 - j)
                         report "Data bit not transmitted correctly"
                         severity WARNING;
                 end loop;
 
                 -- Acknowledge
-                wait until falling_edge(sclk_bin);
+                wait until falling_edge(scl_bin);
                 if ACKNOWLEDGE_WRITE_DATA then
-                    sdata_sim <= '0';
+                    sda <= '0';
                 end if;
-                wait until rising_edge(sclk_bin);
-                wait until falling_edge(sclk_bin);
-                sdata_sim <= 'Z';
+                wait until rising_edge(scl_bin);
+                wait until falling_edge(scl_bin);
+                sda <= 'Z';
             end loop;
         end if;
 
-        if RX_LENGTH > 0 then
+        if RECV_LEN > 0 then
             -- Repeated start condition
-            wait until sdata_bin = '0' and sclk_bin = '1';
+            wait until sda_bin = '0' and scl_bin = '1';
 
             -- Receive slave address
             for i in 6 downto 0 loop
-                wait until rising_edge(sclk_bin);
-                assert sdata_bin = SLAVE_ADDRESS(i)
+                wait until rising_edge(scl_bin);
+                assert sda_bin = SLAVE_ADDRESS(i)
                     report "Slave address not transmitted correctly"
                     severity WARNING;
             end loop;
 
             -- Receive direction
-            wait until rising_edge(sclk_bin);
-            assert sdata_bin = '1' -- Reception
+            wait until rising_edge(scl_bin);
+            assert sda_bin = '1' -- Reception
                 report "Wrong R/W"
                 severity WARNING;
 
             -- Acknowledge
-            wait until falling_edge(sclk_bin);
+            wait until falling_edge(scl_bin);
             if ACKNOWLEDGE_READ_ADDRESS then
-                sdata_sim <= '0';
+                sda <= '0';
             end if;
-            wait until rising_edge(sclk_bin);
+            wait until rising_edge(scl_bin);
 
-            for i in TX_LENGTH-1 downto 0 loop
+            for i in SEND_LEN-1 downto 0 loop
                 -- Send data byte
                 for j in 7 downto 0 loop
-                    wait until falling_edge(sclk_bin);
-                    if RX_PDATA(i * 8 + j) = '1' then
-                        sdata_sim <= 'Z';
+                    wait until falling_edge(scl_bin);
+                    if RECV_DATA(i * 8 + j) = '1' then
+                        sda <= 'Z';
                     else
-                        sdata_sim <= '0';
+                        sda <= '0';
                     end if;
                 end loop;
 
                 -- Acknowledge
-                wait until falling_edge(sclk_bin);
-                sdata_sim <= 'Z';
-                wait until rising_edge(sclk_bin);
-                assert sdata_bin = '0'
+                wait until falling_edge(scl_bin);
+                sda <= 'Z';
+                wait until rising_edge(scl_bin);
+                assert sda_bin = '0'
                     report "Master did not acknowledge"
                     severity WARNING;
             end loop;
@@ -182,19 +210,5 @@ begin
     begin
         wait for TIMEOUT;
         report "Timeout" severity FAILURE;
-    end process;
-
-    process
-    begin
-        wait until error_sim = '1';
-        wait for BIT_PERIOD;
-        report "I2C error" severity FAILURE;
-    end process;
-
-    process
-    begin
-        wait until done_sim = '1';
-        wait for BIT_PERIOD;
-        report "Done" severity FAILURE;
     end process;
 end Simulation;
