@@ -1,6 +1,6 @@
 
 #include <Platform/Platform-config.h>
-#include <Memory/Memory.h>
+#include <string.h>
 #include "Accelerometer.h"
 
 #define ACL_WRITE_CMD 0x0A

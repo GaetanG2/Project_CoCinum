@@ -14,7 +14,7 @@ CC       := $(PLATFORM)-gcc
 OBJCOPY  := $(PLATFORM)-objcopy
 
 LD_SCRIPT := $(SCRIPTS_DIR)/Virgule.ld
-C_FLAGS    = -march=rv32i -mabi=ilp32 -ffreestanding -I$(C_DIR) $(C_FLAGS_USER)
+C_FLAGS    = -march=rv32i -mabi=ilp32 -ffreestanding -I$(C_DIR) -I$(C_DIR)/LibC $(C_FLAGS_USER)
 LD_FLAGS   = -nostdlib -T $(LD_SCRIPT) $(LD_FLAGS_USER)
 
 OBJ_STARTUP := $(ASM_DIR)/Startup/Startup.o

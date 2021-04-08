@@ -1,6 +1,6 @@
 
-#ifndef MEMORY_H_
-#define MEMORY_H_
+#ifndef STRING_H_
+#define STRING_H_
 
 #include <stddef.h>
 
