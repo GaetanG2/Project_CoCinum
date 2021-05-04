@@ -1,0 +1,11 @@
+
+#ifndef PLATFORM_H_
+#define PLATFORM_H_
+
+#define INTC_ADDRESS 0x81000000
+#define UART_ADDRESS 0x82000000
+
+#define INTC_EVENTS_UART_RX 0x0001
+#define INTC_EVENTS_UART_TX 0x0002
+
+#endif

@@ -1,7 +1,7 @@
 
 #include <InterruptController/InterruptController.h>
 #include <UART/UART.h>
-#include <Platform/Platform-config.h>
+#include "Platform.h"
 
 // Defined in virgule.ld
 extern uint32_t __boot_start, __boot_end;
@@ -42,8 +42,7 @@ static void receive(void) {
     InterruptController_disable(intc, -1);
     InterruptController_clear_events(intc, -1);
 
-    // We don't use the global variable 'uart' from Platform.c
-    // because it may be overwritten while loading.
+    // We use a local instance of UART to avoid overwriting it while loading.
     UART uart = {
         .intc        = intc,
         .rx_evt_mask = INTC_EVENTS_UART_RX,
