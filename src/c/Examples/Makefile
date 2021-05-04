@@ -15,6 +15,6 @@ C_DEPS = \
 
 C_FLAGS_USER = -Os
 
-all: Hello.hex Echo.hex Tick.hex SegmentDisplay.hex UserIO.hex
+all: Hello.hex Echo.hex Tick.hex SegmentDisplay.hex UserIO.hex Joystick.hex Accelerometer.hex
 
 include ../../../scripts/Virgule.make
