@@ -11,7 +11,7 @@ C_DEPS = \
 	../SPI/SPI.c \
 	../SPI/Joystick.c \
 	../SPI/Accelerometer.c \
-	../Platform/Platform.c
+	Platform.c
 
 C_FLAGS_USER = -Os
 

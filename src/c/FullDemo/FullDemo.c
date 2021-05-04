@@ -1,8 +1,5 @@
 
-#include <Platform/Platform.h>
-#include <SPI/Joystick.h>
-#include <SPI/Accelerometer.h>
-#include <stddef.h>
+#include "Platform.h"
 
 static uint16_t count;
 static uint16_t points;

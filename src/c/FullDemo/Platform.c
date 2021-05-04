@@ -1,6 +1,5 @@
 
 #include "Platform.h"
-#include "Platform-config.h"
 
 #define REG(T, ADDR, N) (T*)(ADDR + 4 * N)
 
