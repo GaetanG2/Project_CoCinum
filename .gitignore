@@ -9,3 +9,4 @@ build
 sim_build
 results.xml
 *.cf
+*.hex
