@@ -23,5 +23,6 @@ bool UserInputs_has_events(UserInputs *dev);
 void UserInputs_clear_events(UserInputs *dev);
 uint32_t UserInputs_get_on_events(UserInputs *dev);
 uint32_t UserInputs_get_off_events(UserInputs *dev);
+uint32_t UserInputs_get_status(UserInputs *dev);
 
 #endif
