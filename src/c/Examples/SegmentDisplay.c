@@ -1,7 +1,7 @@
 
 #include "Platform.h"
 
-static volatile unsigned tick;
+static volatile uint16_t tick;
 
 __attribute__((interrupt("machine")))
 void irq_handler(void) {
@@ -23,11 +23,12 @@ void main(void) {
     Timer_enable_interrupts(timer1);
 
     tick = 0;
-    unsigned tock = 0;
+    uint16_t tock = 0;
 
     while (!UART_has_data(uart)) {
         if (tick != tock) {
-            UART_puts(uart, "Tick\n");
+            unsigned points = 1 << (tock % 4);
+            SegmentDisplay_show(display, tock, points);
             tock ++;
         }
     }
