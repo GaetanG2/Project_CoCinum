@@ -7,8 +7,8 @@ entity SPIMaster is
     reset_i: in std_logic;
     write_i: in std_logic;
     address_i: in std_logic_vector (1 downto 0);
-    wdata_i: in std_logic_vector (7 downto 0);
-    rdata_o: out std_logic_vector (7 downto 0);
+    data_i: in std_logic_vector (7 downto 0);
+    data_o: out std_logic_vector (7 downto 0);
     done_o: out std_logic;
     miso_i: in std_logic;
     mosi_o: out std_logic;
@@ -27,11 +27,11 @@ architecture rtl of spimaster is
   signal wrap_write_i: std_logic;
   subtype typwrap_address_i is std_logic_vector (1 downto 0);
   signal wrap_address_i: typwrap_address_i;
-  subtype typwrap_wdata_i is std_logic_vector (7 downto 0);
-  signal wrap_wdata_i: typwrap_wdata_i;
+  subtype typwrap_data_i is std_logic_vector (7 downto 0);
+  signal wrap_data_i: typwrap_data_i;
   signal wrap_miso_i: std_logic;
-  subtype typwrap_rdata_o is std_logic_vector (7 downto 0);
-  signal wrap_rdata_o: typwrap_rdata_o;
+  subtype typwrap_data_o is std_logic_vector (7 downto 0);
+  signal wrap_data_o: typwrap_data_o;
   signal wrap_done_o: std_logic;
   signal wrap_mosi_o: std_logic;
   signal wrap_sclk_o: std_logic;
@@ -151,14 +151,14 @@ begin
   wrap_reset_i <= reset_i;
   wrap_write_i <= write_i;
   wrap_address_i <= address_i;
-  wrap_wdata_i <= wdata_i;
+  wrap_data_i <= data_i;
   wrap_miso_i <= miso_i;
-  rdata_o <= wrap_rdata_o;
+  data_o <= wrap_data_o;
   done_o <= wrap_done_o;
   mosi_o <= wrap_mosi_o;
   sclk_o <= wrap_sclk_o;
   cs_n_o <= wrap_cs_n_o;
-  wrap_rdata_o <= n73_o;
+  wrap_data_o <= n73_o;
   wrap_done_o <= n104_q;
   wrap_mosi_o <= n173_q;
   wrap_sclk_o <= sclk_reg;
@@ -189,12 +189,12 @@ begin
   sclk_reg <= n158_q; -- (isignal)
   -- SPIMaster.vhd:55:21
   n13_o <= '1' when wrap_address_i = "00" else '0';
-  -- SPIMaster.vhd:56:58
-  n14_o <= wrap_wdata_i (2);
-  -- SPIMaster.vhd:57:58
-  n15_o <= wrap_wdata_i (1);
-  -- SPIMaster.vhd:58:58
-  n16_o <= wrap_wdata_i (0);
+  -- SPIMaster.vhd:56:57
+  n14_o <= wrap_data_i (2);
+  -- SPIMaster.vhd:57:57
+  n15_o <= wrap_data_i (1);
+  -- SPIMaster.vhd:58:57
+  n16_o <= wrap_data_i (0);
   -- SPIMaster.vhd:56:21
   n18_o <= '1' when wrap_address_i = "01" else '0';
   -- SPIMaster.vhd:59:21
@@ -220,7 +220,7 @@ begin
     cs_reg when others;
   -- SPIMaster.vhd:54:17
   with n22_o select n26_o <=
-    wrap_wdata_i when "100",
+    wrap_data_i when "100",
     timer_max_reg when "010",
     timer_max_reg when "001",
     timer_max_reg when others;
@@ -228,7 +228,7 @@ begin
   with n22_o select n27_o <=
     data_reg when "100",
     data_reg when "010",
-    wrap_wdata_i when "001",
+    wrap_data_i when "001",
     data_reg when others;
   -- SPIMaster.vhd:62:50
   n28_o <= not phase_reg;
@@ -299,17 +299,17 @@ begin
       n59_q <= n48_o;
     end if;
   end process;
-  -- SPIMaster.vhd:69:68
+  -- SPIMaster.vhd:69:67
   n61_o <= '1' when wrap_address_i = "00" else '0';
-  -- SPIMaster.vhd:70:28
+  -- SPIMaster.vhd:70:27
   n63_o <= "00000" & polarity_reg;
-  -- SPIMaster.vhd:70:43
+  -- SPIMaster.vhd:70:42
   n64_o <= n63_o & phase_reg;
-  -- SPIMaster.vhd:70:55
+  -- SPIMaster.vhd:70:54
   n65_o <= n64_o & cs_reg;
-  -- SPIMaster.vhd:70:68
+  -- SPIMaster.vhd:70:67
   n67_o <= '1' when wrap_address_i = "01" else '0';
-  -- SPIMaster.vhd:71:68
+  -- SPIMaster.vhd:71:67
   n70_o <= '1' when wrap_address_i = "10" else '0';
   n72_o <= n70_o & n67_o & n61_o;
   -- SPIMaster.vhd:68:5
@@ -435,8 +435,8 @@ begin
   n161_o <= not phase_reg;
   -- SPIMaster.vhd:149:28
   n162_o <= start and n161_o;
-  -- SPIMaster.vhd:150:34
-  n163_o <= wrap_wdata_i (7);
+  -- SPIMaster.vhd:150:33
+  n163_o <= wrap_data_i (7);
   -- SPIMaster.vhd:151:51
   n164_o <= not phase_reg;
   -- SPIMaster.vhd:151:37
