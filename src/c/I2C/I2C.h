@@ -25,6 +25,6 @@ typedef struct {
 } I2CDevice;
 
 void I2CDevice_init(I2CDevice *dev);
-void I2CDevice_send_receive(I2CMaster *dev, uint8_t send_len, uint8_t recv_len, uint8_t *data);
+void I2CDevice_send_receive(I2CDevice *dev, uint8_t send_len, uint8_t recv_len, uint8_t *data);
 
 #endif
