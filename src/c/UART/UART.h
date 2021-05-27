@@ -27,5 +27,6 @@ uint8_t UART_getc(UART *dev);
 void UART_puts(UART *dev, const uint8_t *s);
 bool UART_has_data(UART *dev);
 void UART_irq_handler(UART *dev);
+void UART_wait(UART *dev);
 
 #endif

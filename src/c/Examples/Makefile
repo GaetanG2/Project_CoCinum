@@ -11,10 +11,10 @@ C_DEPS = \
 	../SPI/SPI.c \
 	../SPI/Joystick.c \
 	../SPI/Accelerometer.c \
-	../Platform/Platform.c
+	Platform.c
 
 C_FLAGS_USER = -Os
 
-all: FullDemo.hex
+all: Hello.hex Echo.hex Tick.hex SegmentDisplay.hex UserIO.hex Joystick.hex Accelerometer.hex
 
 include ../../../scripts/Virgule.make

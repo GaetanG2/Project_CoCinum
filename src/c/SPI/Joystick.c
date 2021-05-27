@@ -1,5 +1,4 @@
 
-#include <Platform/Platform-config.h>
 #include "Joystick.h"
 
 #define JSTK_SET_LED_RGB 0x84

@@ -111,3 +111,7 @@ void UART_puts(UART *dev, const uint8_t *s) {
 bool UART_has_data(UART *dev) {
     return dev->rx_buffer.count > 0;
 }
+
+void UART_wait(UART *dev) {
+    while (dev->tx_busy);
+}

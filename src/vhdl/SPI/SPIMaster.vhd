@@ -9,8 +9,8 @@ entity SPIMaster is
         reset_i   : in  std_logic;
         write_i   : in  std_logic;
         address_i : in  std_logic_vector(1 downto 0);
-        wdata_i   : in  std_logic_vector(7 downto 0);
-        rdata_o   : out std_logic_vector(7 downto 0);
+        data_i    : in  std_logic_vector(7 downto 0);
+        data_o    : out std_logic_vector(7 downto 0);
         done_o    : out std_logic;
         miso_i    : in  std_logic;
         mosi_o    : out std_logic;
@@ -45,11 +45,11 @@ begin
                 timer_max_reg <= 255;
             elsif write_i = '1' then
                 case address_i is
-                    when "00" => data_reg      <= wdata_i;
-                    when "01" => polarity_reg  <= wdata_i(2);
-                                 phase_reg     <= wdata_i(1);
-                                 cs_reg        <= wdata_i(0);
-                    when "10" => timer_max_reg <= to_integer(unsigned(wdata_i));
+                    when "00" => data_reg      <= data_i;
+                    when "01" => polarity_reg  <= data_i(2);
+                                 phase_reg     <= data_i(1);
+                                 cs_reg        <= data_i(0);
+                    when "10" => timer_max_reg <= to_integer(unsigned(data_i));
                     when others =>
                 end case;
             elsif ... then
@@ -59,10 +59,10 @@ begin
     end process p_addressable_reg;
 
     with address_i select
-        rdata_o <= data_reg                                        when "00",
-                   "00000" & polarity_reg & phase_reg & cs_reg     when "01",
-                   std_logic_vector(to_unsigned(timer_max_reg, 8)) when "10",
-                   "00000000"                                      when others;
+        data_o <= data_reg                                        when "00",
+                  "00000" & polarity_reg & phase_reg & cs_reg     when "01",
+                  std_logic_vector(to_unsigned(timer_max_reg, 8)) when "10",
+                  "00000000"                                      when others;
 
     start <= write_i when address_i = "00" else  '0';
     

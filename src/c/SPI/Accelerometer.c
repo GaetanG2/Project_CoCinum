@@ -1,5 +1,4 @@
 
-#include <Platform/Platform-config.h>
 #include <string.h>
 #include "Accelerometer.h"
 
