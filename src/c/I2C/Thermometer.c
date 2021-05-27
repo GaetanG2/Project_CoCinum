@@ -8,5 +8,5 @@ void Thermometer_init(I2CDevice *dev) {
 int16_t Thermometer_get_temperature(I2CDevice *dev) {
     uint8_t data[2];
     I2CDevice_send_receive(dev, 1, 2, data);
-    return ((int16_t)data[0] << 5) | (data[1] >> 3)
+    return ((int16_t)data[0] << 5) | (data[1] >> 3);
 }
