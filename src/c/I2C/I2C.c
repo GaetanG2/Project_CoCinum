@@ -9,6 +9,8 @@ void I2CMaster_init(I2CMaster *dev) {
 void I2CMaster_send_receive(I2CMaster *dev, uint8_t slave_address, uint8_t send_len, uint8_t recv_len, uint8_t *data) {
     *dev->control = ((uint32_t)send_len << 12) | ((uint32_t)recv_len << 8) | slave_address;
 
+    // Copier data[0..send_len-1] dans dev->data.
+    // Premier octet aligné à gauche.
     uint32_t buf = 0;
     for (int n = 0; n < 4; n ++) {
         if (n < send_len) {
@@ -21,11 +23,11 @@ void I2CMaster_send_receive(I2CMaster *dev, uint8_t slave_address, uint8_t send_
     while (!InterruptController_has_events(dev->intc, dev->evt_mask));
     InterruptController_clear_events(dev->intc, dev->evt_mask);
 
+    // Copier dev->data dans data[0..recv_len-1].
+    // Dernier octet aligné à droite.
     buf = *dev->data;
-    for (int n = 3; n >= 0; n --) {
-        if (n < recv_len) {
-            data[n] = buf & 0xFF;
-        }
+    for (int n = 0; n < recv_len; n ++) {
+        data[recv_len - n - 1] = buf & 0xFF;
         buf >>= 8;
     }
 }
