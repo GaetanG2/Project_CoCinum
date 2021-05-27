@@ -7,7 +7,7 @@ void I2CMaster_init(I2CMaster *dev) {
 }
 
 void I2CMaster_send_receive(I2CMaster *dev, uint8_t slave_address, uint8_t send_len, uint8_t recv_len, uint8_t *data) {
-    *dev->control = (send_len << 12) | (recv_len << 8) | slave_address;
+    *dev->control = ((uint32_t)send_len << 12) | ((uint32_t)recv_len << 8) | slave_address;
 
     uint32_t buf = 0;
     for (int n = 0; n < 4; n ++) {
