@@ -14,7 +14,7 @@ void I2CMaster_send_receive(I2CMaster *dev, uint8_t slave_address, uint8_t send_
         if (n < send_len) {
             buf |= data[n];
         }
-        buff <<= 8;
+        buf <<= 8;
     }
     *dev->data = buf;
 
