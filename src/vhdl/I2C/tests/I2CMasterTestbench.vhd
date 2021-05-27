@@ -50,8 +50,8 @@ begin
             reset_i   => reset,
             write_i   => write,
             address_i => address,
-            wdata_i   => wdata,
-            rdata_o   => rdata,
+            data_i    => wdata,
+            data_o    => rdata,
             done_o    => done,
             error_o   => err,
             sda_io    => sda,
@@ -89,7 +89,7 @@ begin
             report "I2C error";
         elsif RECV_LEN > 0 then
             assert rdata = RECV_DATA
-                report "rdata"
+                report "data_o"
                 severity ERROR;
         end if;
         report "Done" severity FAILURE;
