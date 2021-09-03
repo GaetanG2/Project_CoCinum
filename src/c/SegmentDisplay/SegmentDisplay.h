@@ -3,9 +3,13 @@
 #define SEGMENT_DISPLAY_H_
 
 #include <stdint.h>
+#include <stddef.h>
 
-typedef uint32_t SegmentDisplay;
+typedef struct {
+    volatile uint8_t *data;
+    size_t width;
+} SegmentDisplay;
 
-void SegmentDisplay_show(SegmentDisplay *display, uint16_t digits, uint16_t points);
+void SegmentDisplay_show(SegmentDisplay *display, const uint8_t digits[], const uint8_t points[]);
 
 #endif
