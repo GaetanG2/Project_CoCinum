@@ -11,53 +11,45 @@ entity VMemory is
     port (
         clk_i     : in  std_logic;
         reset_i   : in  std_logic;
+        valid_i   : in  std_logic;
+        ready_o   : out std_logic;
         address_i : in  word_t;
-        data_i    : in  word_t;
-        data_o    : out word_t;
-        write_i   : in  std_logic;
-        select_i  : in  std_logic_vector(3 downto 0);
-        done_o    : out std_logic
+        rdata_o   : out word_t;
+        wdata_i   : in  word_t;
+        write_i   : in  std_logic_vector(3 downto 0)
     );
 end VMemory;
 
 architecture Behavioral of VMemory is
-    signal data_reg   : word_vector_t(CONTENT'range) := CONTENT;
-    signal byte_write : std_logic_vector(0 to 3);
-    signal enable     : std_logic;
-    signal done_reg   : std_logic := '0';
+    signal data_reg  : word_vector_t(CONTENT'range) := CONTENT;
+    signal ready_reg : std_logic := '0';
 begin
-    enable <= '1' when select_i /= "0000" else '0';
-
-    byte_write_gen : for i in 0 to 3 generate
-        byte_write(i) <= write_i and select_i(i);
-    end generate byte_write_gen;
-
     p_data_reg_o : process(clk_i)
         variable word_address : natural range CONTENT'range;
     begin
         if rising_edge(clk_i) then
-            if enable = '1' then
+            if valid_i = '1' then
                 word_address := to_natural(address_i(address_i'high downto 2));
-                data_o <= data_reg(word_address);
-                for i in 0 to 3 loop
-                    if byte_write(i) = '1' then
-                        data_reg(word_address)(i * 8 + 7 downto i * 8) <= data_i(i * 8 + 7 downto i * 8);
+                rdata_o      <= data_reg(word_address);
+                for i in write_i'range loop
+                    if write_i(i) = '1' then
+                        data_reg(word_address)(i * 8 + 7 downto i * 8) <= wdata_i(i * 8 + 7 downto i * 8);
                     end if;
                 end loop;
             end if;
         end if;
     end process p_data_reg_o;
 
-    p_done_reg : process(clk_i)
+    p_ready_reg : process(clk_i)
     begin
         if rising_edge(clk_i) then
             if reset_i = '1' then
-                done_reg <= '0';
-            elsif enable = '1' and write_i = '0' then
-                done_reg <= not done_reg;
+                ready_reg <= '0';
+            elsif valid_i = '1' and write_i   = "0000" then
+                ready_reg <= not ready_reg;
             end if;
         end if;
-    end process p_done_reg;
+    end process p_ready_reg;
 
-    done_o <= done_reg or write_i;
+    ready_o <= ready_reg when write_i   = "0000" else valid_i;
 end Behavioral;
