@@ -33,10 +33,12 @@ architecture Simulation of I2CMasterTestbench is
 
     signal clk              : std_logic := '0';
     signal reset            : std_logic := '1';
-    signal write            : std_logic;
+    signal valid            : std_logic := '0';
+    signal ready            : std_logic;
+    signal write            : std_logic_vector(3 downto 0);
     signal address          : std_logic;
     signal wdata, rdata     : word_t;
-    signal done, err        : std_logic;
+    signal evt, err         : std_logic;
     signal scl, sda         : std_logic;
     signal scl_bin, sda_bin : std_logic;
 begin
@@ -48,11 +50,13 @@ begin
         port map(
             clk_i     => clk,
             reset_i   => reset,
-            write_i   => write,
+            valid_i   => valid,
+            ready_o   => ready,
             address_i => address,
-            data_i    => wdata,
-            data_o    => rdata,
-            done_o    => done,
+            rdata_o   => rdata,
+            wdata_i   => wdata,
+            write_i   => write,
+            evt_o     => evt,
             error_o   => err,
             sda_io    => sda,
             scl_io    => scl
@@ -70,28 +74,38 @@ begin
     begin
         -- Set lengths and slave address.
         wait until rising_edge(clk) and reset = '0';
+
+        valid   <= '1';
         address <= '1';
-        wdata(15 downto 0) <= std_logic_vector(to_unsigned(SEND_LEN, 4)) &
-                              std_logic_vector(to_unsigned(RECV_LEN, 4)) &
-                              '0' & SLAVE_ADDRESS;
-        write <= '1';
+        wdata(19 downto 16) <= std_logic_vector(to_unsigned(SEND_LEN, 4));
+        wdata(11 downto 8)  <= std_logic_vector(to_unsigned(RECV_LEN, 4));
+        wdata(6  downto 0)  <= SLAVE_ADDRESS;
+        write <= "1111";
+        wait until rising_edge(clk) and ready = '1';
 
         -- Set data to send and start transaction.
-        wait until rising_edge(clk);
         address <= '0';
         wdata   <= SEND_DATA;
+        wait until rising_edge(clk) and ready = '1';
 
-        wait until rising_edge(clk);
-        write <= '0';
+        valid   <= '0';
+        write <= "0000";
 
-        wait until rising_edge(clk) and (done = '1' or err = '1');
+        wait until rising_edge(clk) and (evt = '1' or err = '1');
+
         if err = '1' then
             report "I2C error";
         elsif RECV_LEN > 0 then
+            valid <= '1';
+            wait until rising_edge(clk) and ready = '1';
+
             assert rdata = RECV_DATA
                 report "data_o"
                 severity ERROR;
+
+            valid <= '0';
         end if;
+
         report "Done" severity FAILURE;
     end process p_master;
 
