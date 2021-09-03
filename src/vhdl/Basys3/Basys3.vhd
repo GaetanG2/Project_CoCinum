@@ -29,7 +29,7 @@ entity Basys3 is
         switches_i : in std_logic_vector(15 downto 0);
 
         -- Voyants
-        -- Fichier de contraintes : Basys3_Leds.xdc
+        -- Fichier de contraintes : Basys3_LEDs.xdc
         leds_o : out std_logic_vector(15 downto 0);
 
         -- Afficheurs 7 segments.
