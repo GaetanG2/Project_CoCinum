@@ -19,29 +19,30 @@ architecture Structural of Computer is
     signal sync_reset     : std_logic;
     signal sync_uart_rx   : std_logic;
 
+    signal core_valid     : std_logic;
+    signal core_ready     : std_logic;
     signal core_address   : word_t;
     signal core_rdata     : word_t;
     signal core_wdata     : word_t;
-    signal core_write     : std_logic;
-    signal core_select    : std_logic_vector(3 downto 0);
-    signal core_done      : std_logic;
+    signal core_write     : std_logic_vector(3 downto 0);
     signal core_irq       : std_logic;
 
     signal current_device : device_t;
 
-    signal mem_write      : std_logic;
-    signal mem_select     : std_logic_vector(3 downto 0);
+    signal mem_valid      : std_logic;
+    signal mem_ready      : std_logic;
     signal mem_rdata      : word_t;
-    signal mem_done       : std_logic;
 
-    signal intc_write     : std_logic;
+    signal intc_valid     : std_logic;
+    signal intc_ready     : std_logic;
     signal intc_rdata     : word_t;
     signal intc_events    : word_t;
 
-    signal uart_write     : std_logic;
-    signal uart_tx_done   : std_logic;
-    signal uart_rx_done   : std_logic;
+    signal uart_valid     : std_logic;
+    signal uart_ready     : std_logic;
     signal uart_rdata     : word_t;
+    signal uart_tx_evt    : std_logic;
+    signal uart_rx_evt    : std_logic;
 begin
     -- Concurrent statements
 end Structural;
