@@ -3,15 +3,19 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.Virgule_pkg.all;
+
 entity SPIMaster is
     port(
         clk_i     : in  std_logic;
         reset_i   : in  std_logic;
-        write_i   : in  std_logic;
+        valid_i   : in  std_logic;
+        ready_o   : out std_logic;
         address_i : in  std_logic_vector(1 downto 0);
-        data_i    : in  std_logic_vector(7 downto 0);
-        data_o    : out std_logic_vector(7 downto 0);
-        done_o    : out std_logic;
+        rdata_o   : out byte_t;
+        wdata_i   : in  byte_t;
+        write_i   : in  std_logic;
+        evt_o     : out std_logic;
         miso_i    : in  std_logic;
         mosi_o    : out std_logic;
         sclk_o    : out std_logic;
@@ -29,7 +33,7 @@ architecture Behavioral of SPIMaster is
     signal timer_max_reg : integer range 0 to 255;
     signal timer_reg     : integer range 0 to 255;
     signal bit_index_reg : integer range 0 to 7;
-    signal data_reg      : std_logic_vector(7 downto 0);
+    signal data_reg      : byte_t;
 
     signal sclk_half     : std_logic;
     signal sclk_cycle    : std_logic;
@@ -43,13 +47,13 @@ begin
                 phase_reg     <= '0';
                 cs_reg        <= '0';
                 timer_max_reg <= 255;
-            elsif write_i = '1' then
+            elsif valid_i = '1' and write_i = '1' then
                 case address_i is
-                    when "00" => data_reg      <= data_i;
-                    when "01" => polarity_reg  <= data_i(2);
-                                 phase_reg     <= data_i(1);
-                                 cs_reg        <= data_i(0);
-                    when "10" => timer_max_reg <= to_integer(unsigned(data_i));
+                    when "00" => data_reg      <= wdata_i;
+                    when "01" => polarity_reg  <= wdata_i(2);
+                                 phase_reg     <= wdata_i(1);
+                                 cs_reg        <= wdata_i(0);
+                    when "10" => timer_max_reg <= to_integer(unsigned(wdata_i));
                     when others =>
                 end case;
             elsif ... then
@@ -59,22 +63,23 @@ begin
     end process p_addressable_reg;
 
     with address_i select
-        data_o <= data_reg                                        when "00",
-                  "00000" & polarity_reg & phase_reg & cs_reg     when "01",
-                  std_logic_vector(to_unsigned(timer_max_reg, 8)) when "10",
-                  "00000000"                                      when others;
+        rdata_o <= data_reg                                        when "00",
+                   "00000" & polarity_reg & phase_reg & cs_reg     when "01",
+                   std_logic_vector(to_unsigned(timer_max_reg, 8)) when "10",
+                   "00000000"                                      when others;
 
-    start <= write_i when address_i = "00" else  '0';
-    
+    ready_o <= valid_i;
+    start   <= valid_i and write_i when address_i = "00" else  '0';
+
     p_busy_reg : process(clk_i)
     begin
         -- ...
     end process p_busy_reg;
 
-    p_done_o : process(clk_i)
+    p_evt_o : process(clk_i)
     begin
         -- ...
-    end process p_done_o;
+    end process p_evt_o;
 
     p_timer_reg : process(clk_i)
     begin

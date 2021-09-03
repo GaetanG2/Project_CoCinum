@@ -11,6 +11,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.Virgule_pkg.all;
 use work.SPIMasterTestbench_pkg.all;
 
 architecture Simulation of SPIMasterTestbench is
@@ -18,11 +19,13 @@ architecture Simulation of SPIMasterTestbench is
     constant SERIAL_CLOCK_PERIOD : time      := CYCLES_PER_BIT * CLK_PERIOD;
     signal clk                   : std_logic := '0';
     signal reset                 : std_logic := '1';
-    signal write                 : std_logic := '0';
+    signal valid                 : std_logic := '0';
+    signal ready                 : std_logic;
     signal address               : std_logic_vector(1 downto 0);
-    signal wdata                 : std_logic_vector(7 downto 0);
-    signal rdata                 : std_logic_vector(7 downto 0);
-    signal done                  : std_logic;
+    signal rdata                 : byte_t;
+    signal wdata                 : byte_t;
+    signal write                 : std_logic := '0';
+    signal evt                   : std_logic;
     signal miso                  : std_logic;
     signal mosi                  : std_logic;
     signal sclk                  : std_logic;
@@ -46,17 +49,19 @@ architecture Simulation of SPIMasterTestbench is
 begin
     master_inst : entity work.SPIMaster
         port map(
-            clk_i   => clk,
-            reset_i => reset,
-            write_i => write,
+            clk_i     => clk,
+            reset_i   => reset,
+            valid_i   => valid,
+            ready_o   => ready,
             address_i => address,
-            wdata_i => wdata,
-            rdata_o => rdata,
-            done_o  => done,
-            mosi_o  => mosi,
-            miso_i  => miso,
-            sclk_o  => sclk,
-            cs_n_o  => cs_n
+            rdata_o   => rdata,
+            wdata_i   => wdata,
+            write_i   => write,
+            evt_o     => evt,
+            mosi_o    => mosi,
+            miso_i    => miso,
+            sclk_o    => sclk,
+            cs_n_o    => cs_n
         );
 
     clk   <= not clk after CLK_PERIOD / 2;
@@ -70,29 +75,36 @@ begin
             report "cs_n: " & std_logic'image(cs_n) & "; expected: '1'"
             severity ERROR;
 
+        valid   <= '1';
         address <= "10";
         wdata   <= std_logic_vector(to_unsigned(CYCLES_PER_BIT - 1, 8));
         write   <= '1';
+        wait until rising_edge(clk) and ready = '1';
 
         -- Configure polarity and phase, select device.
-        wait until rising_edge(clk);
         address <= "01";
         wdata   <= "00000" & POLARITY & PHASE & '1';
+        wait until rising_edge(clk) and ready = '1';
 
         -- Send a byte.
-        wait until rising_edge(clk);
         address <= "00";
         wdata   <= DATA_TO_SLAVE;
-
-        wait until rising_edge(clk);
-        write   <= '0';
+        wait until rising_edge(clk) and ready = '1';
 
         assert cs_n = '0'
             report "cs_n: " & std_logic'image(cs_n) & "; expected: '0'"
             severity ERROR;
 
+
+        valid <= '0';
+        write <= '0';
+
         -- Check received data
-        wait until rising_edge(clk) and done = '1';
+        wait until rising_edge(clk) and evt = '1';
+
+        valid <= '1';
+        wait until rising_edge(clk) and ready = '1';
+
         assert rdata = DATA_FROM_SLAVE
             report "rpdata: " & to_string(rdata) & "; expected: " & to_string(DATA_FROM_SLAVE)
             severity ERROR;
@@ -102,9 +114,10 @@ begin
         address <= "01";
         wdata   <= "00000" & POLARITY & PHASE & '0';
         write   <= '1';
+        wait until rising_edge(clk) and ready = '1';
 
-        wait until rising_edge(clk);
-        write   <= '0';
+        valid <= '0';
+        write <= '0';
     end process p_master;
 
     p_check_mosi : process
