@@ -2,6 +2,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
+use work.Virgule_pkg.all;
+
 entity SerialTransmitter is
     generic(
         CLK_FREQUENCY_HZ : positive;
@@ -10,9 +12,9 @@ entity SerialTransmitter is
     port(
         clk_i   : in  std_logic;
         reset_i : in  std_logic;
+        wdata_i : in  byte_t;
         write_i : in  std_logic;
-        data_i  : in  std_logic_vector(7 downto 0);
-        done_o  : out std_logic;
+        evt_o   : out std_logic;
         tx_o    : out std_logic
     );
 end SerialTransmitter;
@@ -25,7 +27,7 @@ architecture Behavioral of SerialTransmitter is
     signal timer_reg   : natural range 0 to TIMER_MAX;
 
     signal index_reg   : natural range 0 to 7;
-    signal data_reg    : std_logic_vector(7 downto 0);
+    signal data_reg    : byte_t;
 begin
     p_state_reg : process(clk_i)
     begin
@@ -81,7 +83,7 @@ begin
     begin
         if rising_edge(clk_i) then
             if state_reg = IDLE_STATE and write_i = '1' then
-                data_reg <= data_i;
+                data_reg <= wdata_i;
             end if;
         end if;
     end process p_data_reg;
@@ -91,5 +93,5 @@ begin
                 data_reg(index_reg) when DATA_STATE,
                 '1'                 when others;
 
-    done_o <= '1' when state_reg = STOP_STATE and timer_reg = TIMER_MAX else '0';
+    evt_o <= '1' when state_reg = STOP_STATE and timer_reg = TIMER_MAX else '0';
 end Behavioral;

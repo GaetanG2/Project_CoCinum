@@ -2,6 +2,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
+use work.Virgule_pkg.all;
+
 entity SerialReceiver is
     generic(
         CLK_FREQUENCY_HZ : positive;
@@ -10,9 +12,9 @@ entity SerialReceiver is
     port(
         clk_i   : in  std_logic;
         reset_i : in  std_logic;
-        rx_i    : in  std_logic;
-        data_o  : out std_logic_vector(7 downto 0);
-        done_o  : out std_logic
+        rdata_o : out byte_t;
+        evt_o   : out std_logic;
+        rx_i    : in  std_logic
     );
 end SerialReceiver;
 
@@ -24,7 +26,7 @@ architecture Behavioral of SerialReceiver is
     signal timer_reg   : natural range 0 to TIMER_MAX;
 
     signal index_reg   : natural range 0 to 7;
-    signal data_reg    : std_logic_vector(7 downto 0);
+    signal data_reg    : byte_t;
 begin
     p_state_reg : process(clk_i)
     begin
@@ -89,10 +91,10 @@ begin
     begin
         if rising_edge(clk_i) then
             if state_reg = DATA_STATE and timer_reg = TIMER_MAX and index_reg = 7 then
-                data_o <= data_reg;
-                done_o <= '1';
+                rdata_o <= data_reg;
+                evt_o   <= '1';
             else
-                done_o <= '0';
+                evt_o   <= '0';
             end if;
         end if;
     end process p_data_done_o;
