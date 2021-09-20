@@ -13,7 +13,7 @@ entity VMemory is
         reset_i   : in  std_logic;
         valid_i   : in  std_logic;
         ready_o   : out std_logic;
-        address_i : in  word_t;
+        address_i : in  word_address_t;
         rdata_o   : out word_t;
         wdata_i   : in  word_t;
         write_i   : in  std_logic_vector(3 downto 0)
@@ -25,15 +25,15 @@ architecture Behavioral of VMemory is
     signal ready_reg : std_logic := '0';
 begin
     p_data_reg_o : process(clk_i)
-        variable word_address : natural range CONTENT'range;
+        variable index : natural range CONTENT'range;
     begin
         if rising_edge(clk_i) then
             if valid_i = '1' then
-                word_address := to_natural(address_i(address_i'high downto 2));
-                rdata_o      <= data_reg(word_address);
+                index   := to_natural(address_i);
+                rdata_o <= data_reg(index);
                 for i in write_i'range loop
                     if write_i(i) = '1' then
-                        data_reg(word_address)(i * 8 + 7 downto i * 8) <= wdata_i(i * 8 + 7 downto i * 8);
+                        data_reg(index)(i * 8 + 7 downto i * 8) <= wdata_i(i * 8 + 7 downto i * 8);
                     end if;
                 end loop;
             end if;

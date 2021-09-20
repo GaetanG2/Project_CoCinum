@@ -14,6 +14,7 @@ package Virgule_pkg is
     subtype unsigned_byte_t      is unsigned(7 downto 0);
     subtype unsigned_half_word_t is unsigned(15 downto 0);
     subtype unsigned_word_t      is unsigned(31 downto 0);
+    subtype word_address_t       is std_logic_vector(29 downto 0);
 
     type    byte_vector_t        is array(natural range <>) of byte_t;
     type    word_vector_t        is array(natural range <>) of word_t;

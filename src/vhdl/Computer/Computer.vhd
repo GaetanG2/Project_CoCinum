@@ -27,7 +27,7 @@ architecture Structural of Computer is
     signal core_write     : std_logic_vector(3 downto 0);
     signal core_irq       : std_logic;
 
-    signal current_device : device_t;
+    alias  dev_address    : byte_t is core_address(31 downto 24);
 
     signal mem_valid      : std_logic;
     signal mem_ready      : std_logic;
