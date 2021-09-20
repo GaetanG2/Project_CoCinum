@@ -49,6 +49,8 @@ begin
         end if;
     end process p_events_reg;
 
+    events_reg(events_reg'high downto events_i'length) <= (others => '0');
+    
     rdata_o <= mask_reg when address_i = '0' else events_reg;
     ready_o <= valid_i;
     irq_o   <= '1' when (events_reg and mask_reg) /= WORD0 else '0';
