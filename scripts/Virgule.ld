@@ -3,7 +3,7 @@ ENTRY(__reset)
 
 MEM_SIZE   = 64K;
 STACK_SIZE = 4K;
-BOOT_SIZE  = 2K;
+BOOT_SIZE  = 4K;
 
 SECTIONS {
     . = 0x0;
