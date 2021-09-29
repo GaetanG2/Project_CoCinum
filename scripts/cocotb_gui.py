@@ -16,6 +16,7 @@ class TbGui:
 
         self.leds = []
         self.sws  = []
+        self.txts = {}
         self.btn_states = {}
 
         self.root = tk.Tk()
@@ -111,6 +112,21 @@ class TbGui:
     def update_buttons(self):
         for k, v in self.btn_states.items():
             getattr(self.dut, k) <= v
+
+    def add_text_field(self, label, side=tk.TOP, height=1, editable=True):
+        frm = tk.LabelFrame(self.root, text=label)
+        txt = tk.Text(frm, height=height)
+        if editable:
+            txt.bind("<Key>", self.on_key_press)
+        else:
+            txt.config(state=tk.DISABLED, bg=led_color_off, fg=led_color_on)
+        txt.pack()
+        frm.pack(side=side)
+        self.txts[label] = txt
+
+    def on_key_press(self, evt):
+        # Override this method in your testbench
+        print(evt)
 
     def update(self):
         t = datetime.now()

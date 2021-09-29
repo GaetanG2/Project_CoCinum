@@ -1,31 +1,32 @@
 
-    .set INTC_EVENTS,         0x81000004
-    .set UART_DATA,           0x82000000
-    .set INTC_EVENTS_UART_TX, 2
+    .set INTC_ADDRESS,        0x81000000
+    .set UART_ADDRESS,        0x82000000
+    .set INTC_EVENTS_UART_RX, 0x00000001
+    .set INTC_EVENTS_UART_TX, 0x00000002
 
     .global main
 main:
-    la x5, str
-    li x6, INTC_EVENTS
-    li x7, UART_DATA
+    li x5, INTC_ADDRESS
+    li x6, UART_ADDRESS
+    la x7, str
 
 main_loop:
-    lb x4, (x5)
-    beqz x4, main_end
+    lbu x8, (x7)
+    beqz x8, main_end
 
-    sb x4, (x7)
+    sb x8, (x6)
 
-main_polling_loop:
-    lw x4, (x6)
-    andi x4, x4, INTC_EVENTS_UART_TX
-    beqz x4, main_polling_loop
-    sw x4, (x6)
+main_tx_loop:
+    lw x8, 4(x5)
+    andi x8, x8, INTC_EVENTS_UART_TX
+    beqz x8, main_tx_loop
+    sw x8, 4(x5)
 
-    addi x5, x5, 1
+    addi x7, x7, 1
     j main_loop
 
 main_end:
     ret
 
 str:
-    .asciz "Virgule says\n<< Hello! >>\nfrom assembly.\n"
+    .asciz "Virgule says << Hello! >>"
