@@ -5,9 +5,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct {
+#define EVT_MASK_OFF 0
+#define EVT_MASK(n) (1 << n)
+
+typedef volatile struct {
     uint32_t mask;
-    volatile uint32_t events;
+    uint32_t events;
 } InterruptController;
 
 void InterruptController_enable(InterruptController *dev, uint32_t mask);

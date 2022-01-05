@@ -4,16 +4,9 @@
 
 #include <InterruptController/InterruptController.h>
 
-enum {
-    TIMER_LIMIT_REG,
-    TIMER_COUNT_REG
-} TimerRegs;
-
 typedef struct {
-    InterruptController *intc;
-    uint32_t evt_mask;
-    volatile uint32_t *limit;
-    volatile uint32_t *count;
+    const uint32_t address, evt_mask;
+    InterruptController *const intc;
 } Timer;
 
 void Timer_init(Timer *dev);

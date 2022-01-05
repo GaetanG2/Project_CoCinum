@@ -14,9 +14,8 @@ typedef volatile struct {
 } UARTBuffer;
 
 typedef struct {
-    InterruptController *intc;
-    uint32_t rx_evt_mask, tx_evt_mask;
-    volatile uint8_t *data;
+    const uint32_t address, rx_evt_mask, tx_evt_mask;
+    InterruptController *const intc;
     UARTBuffer tx_buffer, rx_buffer;
     volatile bool tx_busy;
 } UART;

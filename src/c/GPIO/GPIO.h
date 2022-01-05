@@ -4,20 +4,12 @@
 
 #include <InterruptController/InterruptController.h>
 
-enum {
-    GPIO_INPUT_REG,
-    GPIO_OUTPUT_REG
-} GPIORegs;
-
 typedef struct {
-    InterruptController *intc;
-    uint32_t evt_mask;
+    const uint32_t address, evt_mask;
+    const uint32_t on_evt_mask, off_evt_mask;
+    InterruptController *const intc;
     InterruptController *intc_on;
-    uint32_t on_evt_mask;
     InterruptController *intc_off;
-    uint32_t off_evt_mask;
-    volatile uint32_t *inputs;
-    uint32_t *outputs;
 } GPIO;
 
 void GPIO_init(GPIO *dev);

@@ -1,19 +1,26 @@
 
 #include "Timer.h"
 
+typedef volatile struct {
+    uint32_t limit;
+    uint32_t count;
+} TimerRegs;
+
+#define REG(dev, name) ((TimerRegs*)dev->address)->name
+
 void Timer_init(Timer *dev) {
     InterruptController_disable(dev->intc, dev->evt_mask);
     InterruptController_clear_events(dev->intc, dev->evt_mask);
-    *dev->limit = 0;
+    REG(dev, limit) = 0;
 }
 
 void Timer_set_limit(Timer *dev, uint32_t limit) {
-    *dev->limit = limit;
+    REG(dev, limit) = limit;
 }
 
 void Timer_delay(Timer *dev) {
     Timer_clear_event(dev);
-    *dev->count = 0;
+    REG(dev, count) = 0;
     while (!Timer_has_events(dev));
     Timer_clear_event(dev);
 }

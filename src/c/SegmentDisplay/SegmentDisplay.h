@@ -6,8 +6,8 @@
 #include <stddef.h>
 
 typedef struct {
-    volatile uint8_t *data;
-    size_t width;
+    const uint32_t address;
+    const size_t width;
 } SegmentDisplay;
 
 void SegmentDisplay_show(SegmentDisplay *display, const uint8_t digits[], const uint8_t points[]);

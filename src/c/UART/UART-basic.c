@@ -1,5 +1,6 @@
 
 #include "UART.h"
+#include "UART-common.h"
 
 void UART_init(UART *dev) {
     InterruptController_disable(dev->intc, dev->tx_evt_mask | dev->rx_evt_mask);
@@ -7,7 +8,7 @@ void UART_init(UART *dev) {
 }
 
 void UART_putc(UART *dev, uint8_t c) {
-    *dev->data = c;
+    REG(dev, data) = c;
     while (!InterruptController_has_events(dev->intc, dev->tx_evt_mask));
     InterruptController_clear_events(dev->intc, dev->tx_evt_mask);
 }
@@ -15,7 +16,7 @@ void UART_putc(UART *dev, uint8_t c) {
 uint8_t UART_getc(UART *dev) {
     while (!InterruptController_has_events(dev->intc, dev->rx_evt_mask));
     InterruptController_clear_events(dev->intc, dev->rx_evt_mask);
-    return *dev->data;
+    return REG(dev, data);
 }
 
 void UART_puts(UART *dev, const uint8_t *s) {

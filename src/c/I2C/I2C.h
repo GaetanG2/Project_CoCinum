@@ -4,24 +4,17 @@
 
 #include <InterruptController/InterruptController.h>
 
-enum {
-    I2C_DATA_REG,
-    I2C_CONTROL_REG
-} I2CMasterRegs;
-
 typedef struct {
-    InterruptController *intc;
-    uint32_t evt_mask;
-    volatile uint32_t *data;
-    uint32_t *control;
+    const uint32_t address, evt_mask;
+    InterruptController *const intc;
 } I2CMaster;
 
 void I2CMaster_init(I2CMaster *dev);
 void I2CMaster_send_receive(I2CMaster *dev, uint8_t slave_address, uint8_t send_len, uint8_t recv_len, uint8_t *data);
 
 typedef struct {
-    I2CMaster * i2c;
-    uint8_t slave_address;
+    I2CMaster *const i2c;
+    const uint8_t slave_address;
 } I2CDevice;
 
 void I2CDevice_init(I2CDevice *dev);

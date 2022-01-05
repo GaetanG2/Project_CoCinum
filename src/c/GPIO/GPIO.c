@@ -1,8 +1,15 @@
 
 #include "GPIO.h"
 
+typedef volatile struct {
+    uint32_t inputs;
+    uint32_t outputs;
+} GPIORegs;
+
+#define REG(dev, name) ((GPIORegs*)dev->address)->name
+
 void GPIO_init(GPIO *dev) {
-    dev->intc_on = (InterruptController*)(dev->outputs + 1);
+    dev->intc_on = (InterruptController*)(dev->address + sizeof(GPIORegs));
     dev->intc_off = dev->intc_on + 1;
 
     GPIO_disable_interrupts(dev);
@@ -38,13 +45,13 @@ uint32_t GPIO_get_off_events(GPIO *dev) {
 }
 
 uint32_t GPIO_get_inputs(GPIO *dev) {
-    return *dev->inputs;
+    return REG(dev, inputs);
 }
 
 uint32_t GPIO_get_outputs(GPIO *dev) {
-    return *dev->outputs;
+    return REG(dev, outputs);
 }
 
 uint32_t GPIO_set_outputs(GPIO *dev, uint32_t value) {
-    *dev->outputs = value;
+    REG(dev, outputs) = value;
 }

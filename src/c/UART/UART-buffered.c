@@ -1,5 +1,6 @@
 
 #include "UART.h"
+#include "UART-common.h"
 #include <InterruptController/InterruptController.h>
 
 static void UARTBuffer_init(UARTBuffer *q) {
@@ -41,7 +42,7 @@ void UART_irq_handler(UART *dev) {
         InterruptController_clear_events(dev->intc, dev->tx_evt_mask);
         // If the transmit buffer is not empty, send the next byte.
         if (dev->tx_buffer.count > 0) {
-            *dev->data = UARTBuffer_read(&dev->tx_buffer);
+            REG(dev, data) = UARTBuffer_read(&dev->tx_buffer);
         }
         else {
             dev->tx_busy = false;
@@ -52,7 +53,7 @@ void UART_irq_handler(UART *dev) {
         // Acknowledge the interrupt request.
         InterruptController_clear_events(dev->intc, dev->rx_evt_mask);
         // Add the received byte to the receive buffer.
-        UARTBuffer_write(&dev->rx_buffer, *dev->data);
+        UARTBuffer_write(&dev->rx_buffer, REG(dev, data));
     }
 }
 
@@ -82,8 +83,8 @@ void UART_putc(UART *dev, uint8_t c) {
         UARTBuffer_write(&dev->tx_buffer, c);
     }
     else {
-        dev->tx_busy = true;
-        *dev->data   = c;
+        dev->tx_busy   = true;
+        REG(dev, data) = c;
     }
 
     // Enable interrupts again to detect the end of the transmit operation.

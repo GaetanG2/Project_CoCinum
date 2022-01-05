@@ -1,6 +1,18 @@
 
 #include "SPI.h"
 
+typedef volatile struct {
+    uint32_t data;
+    uint32_t control;
+    uint32_t timer_max;
+} SPIMasterRegs;
+
+#define POLARITY_MASK 4
+#define PHASE_MASK    2
+#define CS_MASK       1
+
+#define REG(dev, name) ((SPIMasterRegs*)dev->address)->name
+
 void SPIMaster_init(SPIMaster *dev, bool polarity, bool phase, uint8_t cycles_per_bit) {
     InterruptController_disable(dev->intc, dev->evt_mask);
     InterruptController_clear_events(dev->intc, dev->evt_mask);
@@ -13,23 +25,23 @@ void SPIMaster_init(SPIMaster *dev, bool polarity, bool phase, uint8_t cycles_pe
         control |= PHASE_MASK;
     }
 
-    *dev->control   = control;
-    *dev->timer_max = cycles_per_bit - 1;
+    REG(dev, control)   = control;
+    REG(dev, timer_max) = cycles_per_bit - 1;
 }
 
 void SPIMaster_select(SPIMaster *dev) {
-    *dev->control |= CS_MASK;
+    REG(dev, control) |= CS_MASK;
 }
 
 void SPIMaster_deselect(SPIMaster *dev) {
-    *dev->control &= ~CS_MASK;
+    REG(dev, control) &= ~CS_MASK;
 }
 
 uint8_t SPIMaster_send_receive(SPIMaster *dev, uint8_t data) {
-    *dev->data = data;
+    REG(dev, data) = data;
     while (!InterruptController_has_events(dev->intc, dev->evt_mask));
     InterruptController_clear_events(dev->intc, dev->evt_mask);
-    return *dev->data;
+    return REG(dev, data);
 }
 
 void SPIDevice_init(SPIDevice *dev) {
