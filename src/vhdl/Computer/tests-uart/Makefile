@@ -9,7 +9,7 @@ VHDL_SOURCES = $(SRCDIR)/../InputSynchronizer/InputSynchronizer.vhd \
 			   $(SRCDIR)/../UART/UART.vhd \
 			   $(SRCDIR)/../../asm/Echo/Echo_pkg.vhd \
 			   $(PWD)/Computer_pkg.vhd \
-			   $(SRCDIR)/Computer_WithLoader.vhd \
+			   $(SRCDIR)/Computer.vhd \
 			   $(PWD)/ComputerTestbench.vhd
 
 TOPLEVEL = computertestbench
