@@ -127,7 +127,7 @@ begin
   -- VLoadStoreUnit.vhd:33:65
   n940_o <= "000000000000000000000000000000" & align;  --  uext
   -- VLoadStoreUnit.vhd:33:65
-  n942_o <= std_logic_vector (resize (signed (n940_o) * signed'("00000000000000000000000000001000"), 32));
+  n942_o <= std_logic_vector (resize (signed (n940_o & "000"), 32));
   -- VLoadStoreUnit.vhd:33:59
   n943_o <= n942_o (30 downto 0);  --  trunc
   -- VLoadStoreUnit.vhd:33:28
