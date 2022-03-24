@@ -8,3 +8,6 @@ gtkwave::addSignalsFromList [list \
     mem_valid mem_ready mem_rdata \
     io_valid io_rdata \
 ]
+
+gtkwave::/Time/Zoom/Zoom_Full
+
