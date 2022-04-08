@@ -26,7 +26,7 @@ class TbGui:
         self.setup()
 
         self.last_update = datetime.now()
-        self.root.update()
+        self.update()
 
     def setup():
         pass

@@ -20,3 +20,6 @@ export COCOTB_REDUCED_LOG_FMT = 1
 export PYTHONPATH = ../../../../scripts/
 
 include $(shell cocotb-config --makefiles)/Makefile.sim
+
+%_pkg.vhd: %.s
+	$(MAKE) -C $(dir $@)
