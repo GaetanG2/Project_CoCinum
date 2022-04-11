@@ -14,6 +14,10 @@ void Timer_init(Timer *dev) {
     REG(dev, limit) = 0;
 }
 
+uint32_t Timer_get_limit(Timer *dev) {
+    return REG(dev, limit);
+}
+
 void Timer_set_limit(Timer *dev, uint32_t limit) {
     REG(dev, limit) = limit;
 }

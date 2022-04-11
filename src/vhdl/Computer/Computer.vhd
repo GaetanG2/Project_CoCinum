@@ -17,7 +17,6 @@ end Computer;
 
 architecture Structural of Computer is
     signal sync_reset    : std_logic;
-    signal sync_switches : std_logic_vector(15 downto 0);
 
     signal core_valid    : std_logic;
     signal core_ready    : std_logic;
