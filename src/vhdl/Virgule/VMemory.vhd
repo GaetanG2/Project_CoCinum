@@ -45,11 +45,11 @@ begin
         if rising_edge(clk_i) then
             if reset_i = '1' then
                 ready_reg <= '0';
-            elsif valid_i = '1' and write_i   = "0000" then
+            elsif valid_i = '1' and write_i = "0000" then
                 ready_reg <= not ready_reg;
             end if;
         end if;
     end process p_ready_reg;
 
-    ready_o <= ready_reg when write_i   = "0000" else valid_i;
+    ready_o <= ready_reg when write_i = "0000" else valid_i;
 end Behavioral;

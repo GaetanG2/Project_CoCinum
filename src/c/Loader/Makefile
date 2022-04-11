@@ -1,6 +1,4 @@
 
-MEM_SIZE = 65536
-
 all: Loader_pkg.vhd
 
 C_DEPS = \
