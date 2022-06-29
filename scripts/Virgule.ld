@@ -1,7 +1,7 @@
 
 ENTRY(__reset)
 
-MEM_SIZE   = 64K;
+MEM_SIZE   = 128K;
 STACK_SIZE = 4K;
 BOOT_SIZE  = 4K;
 

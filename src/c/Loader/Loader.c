@@ -272,10 +272,10 @@ static void receive(void) {
 
     // We use a local instance of UART to avoid overwriting it while loading.
     UART uart = {
+        .address     = UART_ADDRESS,
         .intc        = intc,
-        .rx_evt_mask = INTC_EVENTS_UART_RX,
-        .tx_evt_mask = INTC_EVENTS_UART_TX,
-        .data        = (uint8_t*)UART_ADDRESS
+        .rx_evt_mask = EVT_MASK(INTC_EVENTS_UART_RX),
+        .tx_evt_mask = EVT_MASK(INTC_EVENTS_UART_TX),
     };
 
     static const char *const msg = "\\\\// Send an hex file to execute or press ESC to switch into interactive mode.\n";

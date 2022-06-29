@@ -10,6 +10,7 @@ typedef struct {
 } Timer;
 
 void Timer_init(Timer *dev);
+uint32_t Timer_get_limit(Timer *dev);
 void Timer_set_limit(Timer *dev, uint32_t limit);
 void Timer_enable_interrupts(Timer* dev);
 void Timer_disable_interrupts(Timer* dev);

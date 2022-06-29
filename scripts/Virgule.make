@@ -3,7 +3,8 @@
 #   C_DEPS: C source files to link with the main program
 #	C_FLAGS_USER: additional options for the compiler or the assembler
 #	LD_FLAGS_USER: additional options for the linker
-#   MEM_SIZE: the target memory size
+
+MEM_SIZE = 131072
 
 SCRIPTS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 ASM_DIR     := $(SCRIPTS_DIR)/../src/asm

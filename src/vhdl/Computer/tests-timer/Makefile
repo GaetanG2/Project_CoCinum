@@ -3,8 +3,13 @@ VHDL_SOURCES = $(SRCDIR)/../InputSynchronizer/InputSynchronizer.vhd \
 			   $(SRCDIR)/../Virgule/Virgule_pkg.vhd \
 			   $(SRCDIR)/../Virgule/Virgule-precompiled.vhd \
 			   $(SRCDIR)/../Virgule/VMemory.vhd \
-			   $(SRCDIR)/../../asm/SimpleIO/SimpleIO_pkg.vhd \
-			   $(SRCDIR)/Computer_pkg.vhd \
+			   $(SRCDIR)/../Virgule/VInterruptController.vhd \
+			   $(SRCDIR)/../UART/SerialReceiver.vhd \
+			   $(SRCDIR)/../UART/SerialTransmitter.vhd \
+			   $(SRCDIR)/../UART/UART.vhd \
+			   $(SRCDIR)/../Timer/Timer.vhd \
+			   $(SRCDIR)/../../asm/Blink/Blink_pkg.vhd \
+			   $(PWD)/Computer_pkg.vhd \
 			   $(SRCDIR)/Computer.vhd
 
 TOPLEVEL = computer

@@ -20,7 +20,7 @@ entity Timer is
 end Timer;
 
 architecture Behavioral of Timer is
-    signal limit_reg, count_reg : unsigned_word_t;
+    signal limit_reg, count_reg : unsigned_word_t := unsigned(WORD0);
 begin
     p_limit_reg : process(clk_i)
     begin

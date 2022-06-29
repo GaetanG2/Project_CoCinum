@@ -2,13 +2,12 @@
 gtkwave::addSignalsFromList [list \
     clk_i \
     btn_center_i sync_reset \
-    uart_rx_i sync_uart_rx \
-    uart_tx_o \
-    core_valid core_ready core_address core_write core_wdata core_rdata \
+    leds_o \
+    core_valid core_ready core_address core_write core_wdata core_rdata core_irq \
     mem_valid mem_ready mem_rdata \
     intc_valid intc_ready intc_rdata intc_events \
-    uart_valid uart_ready uart_rdata uart_tx_evt uart_rx_evt \
+    timer_valid timer_ready timer_rdata timer_evt \
+    io_valid
 ]
 
 gtkwave::/Time/Zoom/Zoom_Full
-

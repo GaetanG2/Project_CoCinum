@@ -140,9 +140,9 @@ architecture rtl of spimaster is
   signal n156_o : std_logic;
   signal n157_o : std_logic;
   signal n158_o : std_logic;
-  signal n161_q : std_logic := '0';
-  signal n164_o : std_logic;
-  signal n165_o : std_logic;
+  signal n159_o : std_logic;
+  signal n160_o : std_logic;
+  signal n163_q : std_logic := '0';
   signal n166_o : std_logic;
   signal n167_o : std_logic;
   signal n168_o : std_logic;
@@ -151,8 +151,10 @@ architecture rtl of spimaster is
   signal n171_o : std_logic;
   signal n172_o : std_logic;
   signal n173_o : std_logic;
-  signal n176_q : std_logic;
-  signal n177_o : std_logic;
+  signal n174_o : std_logic;
+  signal n175_o : std_logic;
+  signal n178_q : std_logic;
+  signal n179_o : std_logic;
 begin
   wrap_clk_i <= clk_i;
   wrap_reset_i <= reset_i;
@@ -170,9 +172,9 @@ begin
   wrap_ready_o <= wrap_valid_i;
   wrap_rdata_o <= n75_o;
   wrap_evt_o <= n107_q;
-  wrap_mosi_o <= n176_q;
+  wrap_mosi_o <= n178_q;
   wrap_sclk_o <= sclk_reg;
-  wrap_cs_n_o <= n177_o;
+  wrap_cs_n_o <= n179_o;
   -- SPIMaster.vhd:34:12
   start <= n79_o; -- (signal)
   -- SPIMaster.vhd:35:12
@@ -196,7 +198,7 @@ begin
   -- SPIMaster.vhd:46:12
   sclk_cycle <= n151_o; -- (signal)
   -- SPIMaster.vhd:47:12
-  sclk_reg <= n161_q; -- (isignal)
+  sclk_reg <= n163_q; -- (isignal)
   -- SPIMaster.vhd:57:33
   n13_o <= wrap_valid_i and wrap_write_i;
   -- SPIMaster.vhd:59:21
@@ -430,48 +432,52 @@ begin
   n150_o <= '1' when n148_o = n149_o else '0';
   -- SPIMaster.vhd:138:23
   n151_o <= '0' when n150_o = '0' else '1';
+  -- SPIMaster.vhd:143:42
+  n155_o <= not busy_reg;
+  -- SPIMaster.vhd:143:30
+  n156_o <= wrap_reset_i or n155_o;
   -- SPIMaster.vhd:145:35
-  n155_o <= sclk_half or sclk_cycle;
+  n157_o <= sclk_half or sclk_cycle;
   -- SPIMaster.vhd:146:29
-  n156_o <= not sclk_reg;
+  n158_o <= not sclk_reg;
   -- SPIMaster.vhd:145:13
-  n157_o <= sclk_reg when n155_o = '0' else n156_o;
+  n159_o <= sclk_reg when n157_o = '0' else n158_o;
   -- SPIMaster.vhd:143:13
-  n158_o <= n157_o when wrap_reset_i = '0' else polarity_reg;
+  n160_o <= n159_o when n156_o = '0' else polarity_reg;
   -- SPIMaster.vhd:142:9
   process (wrap_clk_i)
   begin
     if rising_edge (wrap_clk_i) then
-      n161_q <= n158_o;
+      n163_q <= n160_o;
     end if;
   end process;
   -- SPIMaster.vhd:154:42
-  n164_o <= not phase_reg;
+  n166_o <= not phase_reg;
   -- SPIMaster.vhd:154:28
-  n165_o <= start and n164_o;
+  n167_o <= start and n166_o;
   -- SPIMaster.vhd:155:34
-  n166_o <= wrap_wdata_i (7);
+  n168_o <= wrap_wdata_i (7);
   -- SPIMaster.vhd:156:51
-  n167_o <= not phase_reg;
+  n169_o <= not phase_reg;
   -- SPIMaster.vhd:156:37
-  n168_o <= sclk_cycle and n167_o;
+  n170_o <= sclk_cycle and n169_o;
   -- SPIMaster.vhd:156:78
-  n169_o <= sclk_half and phase_reg;
+  n171_o <= sclk_half and phase_reg;
   -- SPIMaster.vhd:156:58
-  n170_o <= n168_o or n169_o;
+  n172_o <= n170_o or n171_o;
   -- SPIMaster.vhd:157:35
-  n171_o <= data_reg (7);
+  n173_o <= data_reg (7);
   -- SPIMaster.vhd:156:13
-  n172_o <= n176_q when n170_o = '0' else n171_o;
+  n174_o <= n178_q when n172_o = '0' else n173_o;
   -- SPIMaster.vhd:154:13
-  n173_o <= n172_o when n165_o = '0' else n166_o;
+  n175_o <= n174_o when n167_o = '0' else n168_o;
   -- SPIMaster.vhd:153:9
   process (wrap_clk_i)
   begin
     if rising_edge (wrap_clk_i) then
-      n176_q <= n173_o;
+      n178_q <= n175_o;
     end if;
   end process;
   -- SPIMaster.vhd:162:16
-  n177_o <= not cs_reg;
+  n179_o <= not cs_reg;
 end rtl;
