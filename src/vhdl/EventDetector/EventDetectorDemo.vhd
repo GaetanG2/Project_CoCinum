@@ -22,7 +22,10 @@ architecture Structural of EventDetectorDemo is
     signal count    : natural range 0 to 15;
     signal segments : std_logic_vector(0 to 6);
 begin
-    detector_inst : entity work.EventDetector(Simple)
+    detector_inst : entity work.EventDetector(Debouncer)
+        generic map(
+            DURATION => 2000000
+        )
         port map(
             clk_i     => clk_i,
             src_i     => btn_center_i,

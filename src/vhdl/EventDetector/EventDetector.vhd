@@ -4,7 +4,7 @@ use ieee.std_logic_1164.all;
 
 entity EventDetector is
     generic(
-        DURATION : positive := 1
+        DURATION : positive := 5
     );
     port(
         clk_i     : in  std_logic;
